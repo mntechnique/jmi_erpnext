@@ -1,6 +1,7 @@
 #page-pos .page-body {
 	color: black !important;
 	font-weight: bolder !important;
+	filter: contrast(100%);
 }
 
 .pos div {
@@ -18,7 +19,16 @@
 	font-weight: bolder !important;
 }
 
-.numeric_keypad{
+.pos .numeric_keypad{
 	color: black !important;
 	font-weight: bolder !important;
+}
+
+.pos .price-info {
+	background-color: black !important;
+	position: relative !important;
+}
+
+.pos .image-field {
+	display: none !important;
 }
