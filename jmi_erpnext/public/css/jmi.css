@@ -1,0 +1,8 @@
+/* MN Technique see license.txt */
+@font-face {
+	font-family:"code128";
+	font-style:normal;
+	font-weight:normal;
+	src:url("/assets/jmi_erpnext/fonts/code128.ttf");
+	src:url("/assets/jmi_erpnext/fonts/code128.ttf") format("truetype")
+}
