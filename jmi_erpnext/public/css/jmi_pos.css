@@ -1,34 +1,51 @@
 #page-pos .page-body {
-	color: black !important;
+	color: #6c7680 !important;
 	font-weight: bolder !important;
 	filter: contrast(100%);
 }
 
 .pos div {
-	color: black !important;
+	color: #6c7680 !important;
 	font-weight: bolder !important;
 }
 
 .pos .page-wrapper {
-	color: black !important;
+	color: #6c7680 !important;
 	font-weight: bolder !important;
+	font-size: 15px;
 }
 
 .pos .page-wrapper .row {
-	color: black !important;
+	color: #6c7680 !important;
 	font-weight: bolder !important;
 }
 
 .pos .numeric_keypad{
-	color: black !important;
+	color: #6c7680 !important;
 	font-weight: bolder !important;
+	font-family: fantasy;
 }
 
 .pos .price-info {
-	background-color: black !important;
+	background-color: #6c7680 !important;
 	position: relative !important;
 }
 
 .pos .image-field {
 	display: none !important;
+}
+
+.pos .image-view-container {
+	display: list-item !important;
+	flex-wrap: wrap !important;
+}
+
+.pos .dropdown-text {
+	color: #6c7680 !important;
+	font-weight: bolder !important;
+}
+
+.pos .input-with-feedback::-webkit-input-placeholder {
+	color: #6c7680 !important;
+	font-weight: bolder !important;
 }
