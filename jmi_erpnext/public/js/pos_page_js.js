@@ -9,6 +9,10 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		this.add_scanner();
 	},
 	add_scanner: function() {
-		this.page.set_secondary_action("Scanner", function(){console.log("scanner")}, "fa fa-barcode", true);
+		this.page.set_secondary_action("Scanner", 
+			function () {
+				frappe.confirm("Scan Item Batch");
+			}, 
+			"fa fa-barcode", true);
 	}
 })
