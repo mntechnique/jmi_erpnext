@@ -1,0 +1,30 @@
+<div class="row">
+	<div class="col-md-12 col-xs-12">
+		<table class="table table-bordered table-striped table-hover table-condensed table-responsive small">
+			<thead>
+				<tr>
+					<th>Barcode Number</th>
+					<th>Barcode</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% if (particulars.length == 0) { %}
+				<tr>
+					<td colspan="3" class="text-center">
+						<span class="text-muted">No Barcode Found.</span>
+					</td>
+				</tr>
+			{% } else { %}
+				{% for (var i=0, l=particulars.length; i<=l-1; i++) { %}
+					<tr>
+						<td><button class="text-muted small" href=""><i class="fa fa-close"></i></button>{{ particulars[i].work_particulars }}</td>
+						<td>{{ particulars[i].uom }}</td>
+						
+						<td class="text-right">{{ particulars[i].total }}</td>
+					</tr>
+				{% } %}
+			{% } %}
+			</tbody>
+		</table>
+	</div>
+</div>
