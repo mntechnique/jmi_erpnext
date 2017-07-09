@@ -1,18 +1,36 @@
 <div class="row">
-	<div class="col-md-12 col-xs-12">
+	<div class="col-md-9 col-xs-9">
+		{% var total = 0.0 %}
 		<div class="panel panel-default">
-			<ul style="list-style: none">
+			<table class="table table-condensed small">
+				<tr>
+					<th>Item</th>
+					<th>Rate</th>
+					<th>Qty</th>
+					<th>Amount</th>
+				</tr>
 				{% if (particulars.length == 0) { %}
-				<li><span class="text-muted">No barcodes scanned.</span></li>
+					<span class="text-muted">No barcodes scanned.</span>
 				{% } else { %}
 					{% for (var i=0, l=particulars.length; i<=l-1; i++) { %}
-						<li>
-							<span class="text-muted">{%= particulars[i]["item_code"] %}</span>
-							<span>{%= particulars[i]["description"] %}</span>
-						</li>
+						<tr>	
+							<td class="h4">
+								{%= particulars[i]["item_code"] %}
+								<br>
+								{%= particulars[i]["description"] %}
+							</td>
+							<td class="h4">{%= particulars[i]["rate"] %}</td>
+							<td class="h4">{%= particulars[i]["qty"] %}</td>
+							<td class="h4">{%= particulars[i]["amt"] %}</td>
+						</tr>
+						{% total = total + particulars[i]["amt"] %}
 					{% } %}
 				{% } %}	
-			</ul>
+			</table>
+			
 		</div>
+	</div>
+	<div class="col-md-3 col-xs-3">
+		<h4>Total {%= total || 0.0 %}</b4>
 	</div>
 </div>
