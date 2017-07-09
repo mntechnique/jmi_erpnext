@@ -16,7 +16,7 @@ app_license = "GPL v3"
 
 # include js, css files in header of desk.html
 app_include_css = "/assets/css/jmi.min.css"
-# app_include_js = "/assets/jmi_erpnext/js/jmi_erpnext.js"
+app_include_js = "/assets/js/jmi.min.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/jmi_erpnext/css/jmi_erpnext.css"
