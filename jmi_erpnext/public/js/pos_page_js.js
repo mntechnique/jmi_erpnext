@@ -1,11 +1,12 @@
 // POS page js.
 
 var jmi = {};
-jmi.super = erpnext.pos.PointOfSale.prototype;
+jmi.pos = {};
+jmi.pos.super = erpnext.pos.PointOfSale.prototype;
 
 erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 	init: function (wrapper) {
-		jmi.super.init(wrapper);
+		jmi.pos.super.init(wrapper);
 		this.add_scanner();
 		this.dialog_items = [];
 		this.render_items_in_dialog();
@@ -22,21 +23,24 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					{fieldtype: "HTML", fieldname: "scanned_items", label: __("Items List"), readonly:1}
 				]
 			});
-
-			dialog.fields_dict.barcode_no.$input.on("keypress",function(event) {
+			
+			dialog.fields_dict.barcode_no.$input.on("keypress",function(event) { 
 				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 13)){
-					var item = jmi.super.items.filter(function(i) { return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
-					
+					var item = me.items.filter(function(i) { return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
 					var existing_item = me.dialog_items.filter(function(i) {return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
 					
 					console.log("Scanned barcode: ", dialog.fields_dict.barcode_no.$input.val(), ", Item:", item[0]);
 
 					if (item.length > 0) {
 						if(existing_item.length == 0) {
-							item[0]["rate"] = jmi.super.price_list_data[item[0]["item_code"]];
+							item[0]["rate"] = me.price_list_data[item[0]["item_code"]];
 							item[0]["qty"] = 1;
 							item[0]["amt"] = item[0]["rate"] * item[0]["qty"];
+							
+							console.log(me.get_items(item[0]["item_code"]));
 							me.dialog_items.push(item[0]);
+
+							me.get_items(item[0]["item_code"]);
 						} else {
 							existing_item[0].qty += 1;
 							existing_item[0]["amt"] = existing_item[0]["rate"] * existing_item[0]["qty"];
@@ -49,9 +53,36 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 
 			dialog.set_primary_action(__("Save"), function() {
-				var values = dialog.get_values();
+				for(var i=0;i<me.dialog_items.length;i++){
+					
+					var existing_items = me.frm.doc.items.filter(function(j) {return j.barcode === me.dialog_items[i].barcode});
+					console.log(existing_items)
+					
+					if (me.frm.doc.items.length > 0) {
+						if(existing_items.length == 0) {} 
+						else {
+							existing_items[i].qty += 1;
+							existing_items[i]["amt"] = existing_items[i]["rate"] * existing_items[i]["qty"];
+							// existing_items[i]["net_amount"] = existing_items[i]["rate"] * existing_items[i]["qty"];
+						}
+						console.log(me.dialog_items[i])
+						me.frm.doc.items.push(me.dialog_items[i]);
+					}
+				}
+				
+				// console.log(me.frm.doc.grand_total);
+				// me.apply_pricing_rule();
+				// me.discount_amount_applied = false;
+				me._calculate_taxes_and_totals();
+				// me.calculate_discount_amount();
+				me.show_items_in_item_cart();
+				// me.refresh(true);
+				
+				
+				// dialog.clear(); dialog.hide();				
 			});
 			dialog.show();
+			dialog.has_primary_action = false;
 
 		}, "fa fa-barcode", true);
 	},
@@ -64,19 +95,3 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 
 	}
 })
-
-
-
-function show_items_list(frm) {
-	// frappe.call({
-	// 	doc: frm.doc,
-	// 	method: "get_service_details",
-	// 	callback: function(r) {
-	// 		$(frm.fields_dict['service_details_html'].wrapper)
-  //          .html("<div class='text-muted text-center' style='padding-top:5%;'>No Records.</div>");
-
-	// 	    $(frm.fields_dict['service_details_html'].wrapper)
-	// 	        .html(frappe.render_template("service_vehicle_details",{"service_vehicle_details":r.message || []}));
-	// 	}
-	// });
-}
