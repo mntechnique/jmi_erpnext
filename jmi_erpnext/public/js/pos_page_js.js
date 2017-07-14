@@ -15,7 +15,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		var me = this;
 		
 		me.page.set_secondary_action("Scanner", function(){
-			console.log("scanner")
 			var dialog = new frappe.ui.Dialog({
 				title: __("New Items"),
 				fields: [
@@ -28,16 +27,12 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 13)){
 					var item = me.items.filter(function(i) { return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
 					var existing_item = me.dialog_items.filter(function(i) {return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
-					
-					console.log("Scanned barcode: ", dialog.fields_dict.barcode_no.$input.val(), ", Item:", item[0]);
 
 					if (item.length > 0) {
 						if(existing_item.length == 0) {
 							item[0]["rate"] = me.price_list_data[item[0]["item_code"]];
 							item[0]["qty"] = 1;
 							item[0]["amt"] = item[0]["rate"] * item[0]["qty"];
-							
-							console.log(me.get_items(item[0]["item_code"]));
 							me.dialog_items.push(item[0]);
 
 							me.get_items(item[0]["item_code"]);
@@ -53,33 +48,26 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 
 			dialog.set_primary_action(__("Save"), function() {
-				for(var i=0;i<me.dialog_items.length;i++){
-					
-					var existing_items = me.frm.doc.items.filter(function(j) {return j.barcode === me.dialog_items[i].barcode});
-					console.log(existing_items)
-					
-					if (me.frm.doc.items.length > 0) {
-						if(existing_items.length == 0) {} 
-						else {
-							existing_items[i].qty += 1;
-							existing_items[i]["amt"] = existing_items[i]["rate"] * existing_items[i]["qty"];
-							// existing_items[i]["net_amount"] = existing_items[i]["rate"] * existing_items[i]["qty"];
-						}
-						console.log(me.dialog_items[i])
+				for(var i=0;i<me.dialog_items.length;i++){					
+					var existing_cart_items = me.frm.doc.items.filter(function(j) {return j.item_code === me.dialog_items[i].item_code});
+			
+					if(existing_cart_items.length > 0) {
+						existing_cart_items[0].qty = existing_cart_items[0].qty + me.dialog_items[i].qty;
+						// existing_items[i]["amt"] = existing_items[i]["rate"] * existing_items[i]["qty"];
+					}else{
 						me.frm.doc.items.push(me.dialog_items[i]);
 					}
 				}
 				
-				// console.log(me.frm.doc.grand_total);
-				// me.apply_pricing_rule();
-				// me.discount_amount_applied = false;
+				me.apply_pricing_rule();
+				me.discount_amount_applied = false;
 				me._calculate_taxes_and_totals();
-				// me.calculate_discount_amount();
+				me.calculate_discount_amount();
 				me.show_items_in_item_cart();
-				// me.refresh(true);
+				me.refresh(true);
 				
 				
-				// dialog.clear(); dialog.hide();				
+				dialog.clear(); dialog.hide();				
 			});
 			dialog.show();
 			dialog.has_primary_action = false;
