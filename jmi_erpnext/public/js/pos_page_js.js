@@ -12,14 +12,13 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		this.render_items_in_dialog();
 	},
 	make_new_cart: function() {
-		console.log("make new cart");
 		jmi.pos.super.make_new_cart();
 		this.add_scanner();
 	},
 	add_scanner: function() {
 		var me = this;
-		
-		me.page.set_secondary_action("Scanner", function(){
+
+		me.page.add_menu_item(__("Scanner"), function () {
 			var dialog = new frappe.ui.Dialog({
 				title: __("New Items"),
 				fields: [
@@ -55,8 +54,12 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 			dialog.show();
 			dialog.has_primary_action = false;
+		})
 
-		}, "fa fa-barcode", true);
+		// me.page.set_secondary_action("Scanner", function(){
+			
+
+		// }, "fa fa-barcode", true);
 	},
 	render_items_in_dialog: function() {
 		var me = this;
@@ -105,7 +108,12 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				me.render_items_in_dialog();
 				me.dialog_search.$input.val();
 			}				
-		});	
+		});
+	},
+	make_menu_list: function() {
+		var me = this;
+		jmi.pos.super.make_menu_list();
+		this.add_scanner();
 	}
 
 })
