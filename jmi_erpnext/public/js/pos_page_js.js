@@ -83,8 +83,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		me.dialog_search.$input.on("keyup", function (e) {
 			var keyCode = e.keyCode || e.which;
 
-			console.log("keycode", keyCode);
-
 			if ((me.dialog_search.$input.val() != "") && (keyCode == 13)){
 
 				var item = me.items.filter(function(i) { return i.barcode === me.dialog_search.$input.val()});
