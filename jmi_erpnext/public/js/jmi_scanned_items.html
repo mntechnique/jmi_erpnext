@@ -20,8 +20,8 @@
 								{%= particulars[i]["description"] %}
 							</td>
 							<td class="h4">{%= particulars[i]["rate"] %}</td>
-							<td class="h4">{%= particulars[i]["qty"] %}</td>
-							<td class="h4">{%= particulars[i]["amt"] %}</td>
+							<td class="h4">{%= Math.round(particulars[i]["qty"] * 100) / 100 %}</td>
+							<td class="h4">{%= Math.round(particulars[i]["amt"] * 100) / 100 %}</td>
 						</tr>
 						{% total = total + particulars[i]["amt"] %}
 					{% } %}
@@ -31,6 +31,6 @@
 		</div>
 	</div>
 	<div class="col-md-3 col-xs-3">
-		<h4>Total {%= total || 0.0 %}</b4>
+		<h4>Total {%= (Math.round(total * 100) / 100) || 0.00 %}</b4>
 	</div>
 </div>
