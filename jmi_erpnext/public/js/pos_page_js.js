@@ -23,8 +23,11 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				]
 			});
 			
-			dialog.fields_dict.barcode_no.$input.on("keypress",function(event) { 
-				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 13)){
+			dialog.fields_dict.barcode_no.$input.on("keydown",function(event) { 
+				// console.log(event)
+				// ||(event.which == 10)
+				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 9)){
+					event.preventDefault();
 					var item = me.items.filter(function(i) { return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
 					var existing_item = me.dialog_items.filter(function(i) {return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
 
