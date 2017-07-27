@@ -11,6 +11,10 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		this.dialog_items = [];
 		this.render_items_in_dialog();
 	},
+	make_new_cart: function() {
+		jmi.pos.super.make_new_cart();
+		this.add_scanner();
+	},	
 	add_scanner: function() {
 		var me = this;
 		
@@ -24,8 +28,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 			
 			dialog.fields_dict.barcode_no.$input.on("keydown",function(event) { 
-				// console.log(event)
-				// ||(event.which == 10)
 				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 9)){
 					event.preventDefault();
 					var item = me.items.filter(function(i) { return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
@@ -69,7 +71,7 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				me.show_items_in_item_cart();
 				me.refresh(true);
 				
-				
+				me.dialog_items = [];
 				dialog.clear(); dialog.hide();				
 			});
 			dialog.show();
