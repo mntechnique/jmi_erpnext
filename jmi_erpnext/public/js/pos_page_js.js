@@ -10,6 +10,9 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		this.add_scanner();
 		this.dialog_items = [];
 		this.render_items_in_dialog();
+		// $(".btn-secondary").click(function(){
+	 //        // $(".modal-dialog").modal({backdrop: "static"});
+	 //    });
 	},
 	make_new_cart: function() {
 		jmi.pos.super.make_new_cart();
@@ -26,7 +29,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					{fieldtype: "HTML", fieldname: "scanned_items", label: __("Items List"), readonly:1}
 				]
 			});
-			
 			dialog.fields_dict.barcode_no.$input.on("keydown",function(event) { 
 				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 9)){
 					event.preventDefault();
@@ -51,6 +53,8 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					dialog.fields_dict.barcode_no.set_value();
 				}				
 			});
+
+
 
 			dialog.set_primary_action(__("Save"), function() {
 				for(var i=0;i<me.dialog_items.length;i++){					
@@ -82,8 +86,40 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 	render_items_in_dialog: function() {
 		var me = this;
 		if (cur_dialog) {
-			dialog_items_html = frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items})
-			cur_dialog.fields_dict.scanned_items.set_value(dialog_items_html);
+			$(cur_dialog.fields_dict['scanned_items'].wrapper)
+			.html(frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items}))
+
+			// for(i=0;i<me.dialog_items.length;i++){
+				console.log(this);
+				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".item_name").on("click",function(e){
+
+					// $(this).find('name="qty"data-item-code=""')
+
+					$(this).parent().parent('tr').children('.qty_td').children('.qty').removeAttr("disabled");
+			
+					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-times').addClass('hidden');
+					// console.log($(this).parent().parent('tr').children('.actions_buttons'));
+					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-check-square').removeClass('hidden');
+				});
+				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".save_check").on("click",function(){
+
+					$(this).parent().parent('tr').children('.qty_td').children('.qty').attr("disabled","true");
+
+					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-check-square').addClass('hidden');
+					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-times').removeClass('hidden');					
+
+					me.apply_pricing_rule();
+					me.discount_amount_applied = false;
+					me._calculate_taxes_and_totals();
+					me.calculate_discount_amount();
+					me.show_items_in_item_cart();
+					me.refresh(true);
+				});
+			// }	
+
+
+			// dialog_items_html = frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items});
+			// cur_dialog.fields_dict.scanned_items.set_value(dialog_items_html);
 		}
 
 	}
