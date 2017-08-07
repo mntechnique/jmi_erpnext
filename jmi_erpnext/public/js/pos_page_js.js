@@ -10,9 +10,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		this.add_scanner();
 		this.dialog_items = [];
 		this.render_items_in_dialog();
-		// $(".btn-secondary").click(function(){
-	 //        // $(".modal-dialog").modal({backdrop: "static"});
-	 //    });
 	},
 	make_new_cart: function() {
 		jmi.pos.super.make_new_cart();
@@ -55,14 +52,28 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 
 
+	// Code from develop branch
+	
+	// },
+	// add_scanner: function() {
+	// 	var me = this;
+
+	// 	me.page.add_menu_item(__("Scanner"), function () {
+	// 		var dialog = new frappe.ui.Dialog({
+	// 			title: __("New Items"),
+	// 			fields: [
+	// 				{fieldtype: "HTML", fieldname: "barcode_no", label: __("Barcode Number")},
+	// 				{fieldtype: "HTML", fieldname: "scanned_items", label: __("Items List"), readonly:1}
+	// 			]
+	// 		});
+			
+	// 		me.make_dialog_search(dialog.fields_dict["barcode_no"].$wrapper);
 
 			dialog.set_primary_action(__("Save"), function() {
 				for(var i=0;i<me.dialog_items.length;i++){					
 					var existing_cart_items = me.frm.doc.items.filter(function(j) {return j.item_code === me.dialog_items[i].item_code});
-			
 					if(existing_cart_items.length > 0) {
 						existing_cart_items[0].qty = existing_cart_items[0].qty + me.dialog_items[i].qty;
-						// existing_items[i]["amt"] = existing_items[i]["rate"] * existing_items[i]["qty"];
 					}else{
 						me.frm.doc.items.push(me.dialog_items[i]);
 					}
@@ -74,13 +85,12 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				me.calculate_discount_amount();
 				me.show_items_in_item_cart();
 				me.refresh(true);
-				
+
 				me.dialog_items = [];
 				dialog.clear(); dialog.hide();				
 			});
 			dialog.show();
 			dialog.has_primary_action = false;
-
 		}, "fa fa-barcode", true);
 	},
 	render_items_in_dialog: function() {
@@ -92,9 +102,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			// for(i=0;i<me.dialog_items.length;i++){
 				console.log(this);
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".item_name").on("click",function(e){
-
-					// $(this).find('name="qty"data-item-code=""')
-
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').removeAttr("disabled");
 			
 					$(this).parent().parent('tr').children('td').children('.fa-check-square').removeClass("hidden");
@@ -119,5 +126,54 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			// cur_dialog.fields_dict.scanned_items.set_value(dialog_items_html);
 		}
 
+	},
+
+	// Below is the code from develop branch
+	make_dialog_search: function(parent) {
+		var me = this;
+		me.dialog_search = frappe.ui.form.make_control({
+			df: {
+				"fieldtype": "Data",
+				"label": "Item",
+				"fieldname": "dialog_item",
+				"placeholder": __("Search Item")
+			},
+			parent: parent,
+			only_input: true
+		});
+
+		me.dialog_search.make_input();
+
+		me.dialog_search.$input.on("keyup", function (e) {
+			var keyCode = e.keyCode || e.which;
+
+			if ((me.dialog_search.$input.val() != "") && (keyCode == 13)){
+
+				var item = me.items.filter(function(i) { return i.barcode === me.dialog_search.$input.val()});
+				var existing_item = me.dialog_items.filter(function(i) {return i.barcode === me.dialog_search.$input.val()});
+
+				if (item.length > 0) {
+					if(existing_item.length == 0) {
+						item[0]["rate"] = me.price_list_data[item[0]["item_code"]];
+						item[0]["qty"] = 1;
+						item[0]["amt"] = item[0]["rate"] * item[0]["qty"];
+						me.dialog_items.push(item[0]);
+
+						me.get_items(item[0]["item_code"]);
+					} else {
+						existing_item[0].qty += 1;
+						existing_item[0]["amt"] = existing_item[0]["rate"] * existing_item[0]["qty"];
+					}
+				}
+
+				me.render_items_in_dialog();
+				me.dialog_search.$input.val();
+			}				
+		});
+	},
+	make_menu_list: function() {
+		var me = this;
+		jmi.pos.super.make_menu_list();
+		this.add_scanner();
 	}
 })
