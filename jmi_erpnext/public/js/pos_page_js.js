@@ -97,16 +97,13 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').removeAttr("disabled");
 			
-					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-times').addClass('hidden');
-					// console.log($(this).parent().parent('tr').children('.actions_buttons'));
-					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-check-square').removeClass('hidden');
+					$(this).parent().parent('tr').children('td').children('.fa-check-square').removeClass("hidden");
 				});
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".save_check").on("click",function(){
 
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').attr("disabled","true");
 
-					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-check-square').addClass('hidden');
-					$(this).parent().parent('tr').children('.actions_buttons').children('.fa-times').removeClass('hidden');					
+					$(this).parent().parent('tr').children('td').children('.fa-check-square').addClass("hidden");
 
 					me.apply_pricing_rule();
 					me.discount_amount_applied = false;
