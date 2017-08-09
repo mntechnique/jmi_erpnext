@@ -95,22 +95,33 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 	},
 	render_items_in_dialog: function() {
 		var me = this;
+		var id=0;
 		if (cur_dialog) {
 			$(cur_dialog.fields_dict['scanned_items'].wrapper)
 			.html(frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items}))
 
-			// for(i=0;i<me.dialog_items.length;i++){
-				console.log(this);
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".item_name").on("click",function(e){
+					//enables the input field
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').removeAttr("disabled");
-			
+					//shows save-check icon
 					$(this).parent().parent('tr').children('td').children('.fa-check-square').removeClass("hidden");
 				});
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".save_check").on("click",function(){
-
+					//disables the field
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').attr("disabled","true");
-
+					//hides the save-check icon
 					$(this).parent().parent('tr').children('td').children('.fa-check-square').addClass("hidden");
+					
+
+					//calculates the new-amt
+					$(this).parent().parent('tr').children('.item_amt')[0].textContent=($(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value)*($(this).parent().parent('tr').children('.item_rate')[0].textContent);
+
+					//edits the changed dialog item
+					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
+					
+					var existing_dialog_items = me.dialog_items.filter(function(item) {console.log(item);return id === item.barcode});
+					existing_dialog_items[0].qty = $(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value;
+					existing_dialog_items[0].amt = $(this).parent().parent('tr').children('.item_amt')[0].textContent;
 
 					me.apply_pricing_rule();
 					me.discount_amount_applied = false;
@@ -119,13 +130,16 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					me.show_items_in_item_cart();
 					me.refresh(true);
 				});
-			// }	
-
+		}	
 
 			// dialog_items_html = frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items});
 			// cur_dialog.fields_dict.scanned_items.set_value(dialog_items_html);
+	},
+	calculate_amt: function(){
+		var me=this;
+		for(i=0;i<me.dialog_items.length;i++){
+			
 		}
-
 	},
 
 	// Below is the code from develop branch

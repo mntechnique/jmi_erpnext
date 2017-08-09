@@ -1,13 +1,16 @@
 <div class="row">
-	<div class="col-md-9 col-xs-9">
-		{% var total = 0.0 %}
+	<div class="col-md-12 col-xs-12">
+		{% total = 0.0 %}
 		<div class="panel panel-default">
 			<table class="table table-condensed small">
 				<thead>
 					<tr>
+						<th>Total {%= (Math.round(total * 100) / 100) || 0.00 %}</th>
+					</tr>	
+					<tr>
 						<th>Item</th>
 						<th>Rate</th>
-						<th>Qty</th>
+						<th style="text-align:center;">Qty</th>
 						<th>Amount</th>
 						<th>Action</th>
 					</tr>
@@ -18,15 +21,15 @@
 					{% for (var i=0, l=particulars.length; i<=l-1; i++) { %}
 						<tr name="item" data-itemcode="{%= particulars[i]["item_code"] %}">	
 							<td class="h4">
-								<a class="item_name" style="cursor:pointer;">
+								<a class="item_name" id="{%= particulars[i]["item_code"] %}" style="cursor:pointer;">
 								{%= particulars[i]["item_code"] %}
 								<br>
 								{%= particulars[i]["description"] %}
 								</a>
 							</td>
-							<td class="h4">{%= particulars[i]["rate"] %}</td>
+							<td class="h4 item_rate">{%= particulars[i]["rate"] %}</td>
 							<td class="qty_td h4 text-center">
-								<input class="qty" style="width:50%" value="{%= Math.round(particulars[i]["qty"] * 100) / 100 %}" 
+								<input class="qty form-control" style="margin-left:35%;width:30%" value="{%= Math.round(particulars[i]["qty"] * 100) / 100 %}" 
 								disabled>
 							</td>
 							<td class="h4 item_amt">{%= Math.round(particulars[i]["amt"] * 100) / 100 %}</td>
@@ -40,7 +43,7 @@
 			</table>
 		</div>
 	</div>
-	<div class="col-md-3 col-xs-3">
-		<h4>Total {%= (Math.round(total * 100) / 100) || 0.00 %}</b4>
-	</div>
+<!-- 	<div class="col-md-3 col-xs-3">
+		
+	</div> -->
 </div>
