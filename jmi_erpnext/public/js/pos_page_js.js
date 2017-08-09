@@ -131,6 +131,48 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					me.refresh(true);
 					me.render_items_in_dialog();
 				});
+
+				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".qty_increment").on("click",function(){
+
+					//edits the changed dialog item
+					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
+					
+					var existing_dialog_item = me.dialog_items.find(function(item) {return id === item.barcode});
+
+					existing_dialog_item.qty = parseInt($(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value) + 1;
+					existing_dialog_item.amt = (existing_dialog_item.qty)*(existing_dialog_item.rate);
+
+					me.apply_pricing_rule();
+					me.discount_amount_applied = false;
+					me._calculate_taxes_and_totals();
+					me.calculate_discount_amount();
+					me.show_items_in_item_cart();
+					me.refresh(true);
+					me.render_items_in_dialog();
+				});
+
+				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".qty_decrement").on("click",function(){
+
+					//edits the changed dialog item
+					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
+					
+					var existing_dialog_item = me.dialog_items.find(function(item) {return id === item.barcode});
+
+					existing_dialog_item.qty = parseInt($(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value) - 1;
+					if(existing_dialog_item.qty == 0){
+						me.dialog_items.splice(me.dialog_items.indexOf(me.dialog_items.find(function(i) { return i.barcode == id})), 1);
+					}else{
+						existing_dialog_item.amt = (existing_dialog_item.qty)*(existing_dialog_item.rate);
+					}
+					me.apply_pricing_rule();
+					me.discount_amount_applied = false;
+					me._calculate_taxes_and_totals();
+					me.calculate_discount_amount();
+					me.show_items_in_item_cart();
+					me.refresh(true);
+					me.render_items_in_dialog();
+				});				
+
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".del_item").on("click",function(e){
 					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
 					me.dialog_items.splice(me.dialog_items.indexOf(me.dialog_items.find(function(i) { return i.barcode == id})), 1);
@@ -141,7 +183,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					me.calculate_discount_amount();
 					me.show_items_in_item_cart();
 					me.refresh(true);	
-
 					me.render_items_in_dialog();
 				});
 		}	
