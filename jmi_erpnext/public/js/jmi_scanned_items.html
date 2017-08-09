@@ -1,11 +1,10 @@
 <div class="row">
 	<div class="col-md-12 col-xs-12">
-		{% total = 0.0 %}
 		<div class="panel panel-default">
 			<table class="table table-condensed small">
 				<thead>
 					<tr>
-						<th>Total {%= (Math.round(total * 100) / 100) || 0.00 %}</th>
+						<th class="h4">Total {%= items_total || 0.00 %}</th>
 					</tr>	
 					<tr>
 						<th>Item</th>
@@ -35,15 +34,12 @@
 							<td class="h4 item_amt">{%= Math.round(particulars[i]["amt"] * 100) / 100 %}</td>
 							<td class="action_buttons h4">
 								<i style="font-size:20px;cursor:pointer;color:blue;" class="save_check fa fa-check-square hidden" aria-hidden="true"></i>
+								<i style="font-size:20px;cursor:pointer;color:grey;" class="del_item fa fa-times" aria-hidden="true"></i>	
 							</td>
 						</tr>
-						{% total = total + particulars[i]["amt"] %}
 					{% } %}
 				{% } %}	
 			</table>
 		</div>
 	</div>
-<!-- 	<div class="col-md-3 col-xs-3">
-		
-	</div> -->
 </div>

@@ -95,33 +95,33 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 	},
 	render_items_in_dialog: function() {
 		var me = this;
-		var id=0;
 		if (cur_dialog) {
 			$(cur_dialog.fields_dict['scanned_items'].wrapper)
-			.html(frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items}))
+			.html(frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items,"items_total":me.calculate_item_total()}))
 
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".item_name").on("click",function(e){
 					//enables the input field
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').removeAttr("disabled");
 					//shows save-check icon
 					$(this).parent().parent('tr').children('td').children('.fa-check-square').removeClass("hidden");
+					//hides the delete icon
+					$(this).parent().parent('tr').children('td').children('.fa-times').addClass("hidden");
 				});
 				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".save_check").on("click",function(){
 					//disables the field
 					$(this).parent().parent('tr').children('.qty_td').children('.qty').attr("disabled","true");
 					//hides the save-check icon
 					$(this).parent().parent('tr').children('td').children('.fa-check-square').addClass("hidden");
-					
-
-					//calculates the new-amt
-					$(this).parent().parent('tr').children('.item_amt')[0].textContent=($(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value)*($(this).parent().parent('tr').children('.item_rate')[0].textContent);
+					//shows the delete icon
+					$(this).parent().parent('tr').children('td').children('.fa-times').removeClass("hidden");					
 
 					//edits the changed dialog item
 					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
 					
-					var existing_dialog_items = me.dialog_items.filter(function(item) {console.log(item);return id === item.barcode});
-					existing_dialog_items[0].qty = $(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value;
-					existing_dialog_items[0].amt = $(this).parent().parent('tr').children('.item_amt')[0].textContent;
+					var existing_dialog_item = me.dialog_items.find(function(item) {return id === item.barcode});
+
+					existing_dialog_item.qty = $(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value;
+					existing_dialog_item.amt = (existing_dialog_item.qty)*(existing_dialog_item.rate);
 
 					me.apply_pricing_rule();
 					me.discount_amount_applied = false;
@@ -129,18 +129,35 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					me.calculate_discount_amount();
 					me.show_items_in_item_cart();
 					me.refresh(true);
+					me.render_items_in_dialog();
+				});
+				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".del_item").on("click",function(e){
+					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
+					me.dialog_items.splice(me.dialog_items.indexOf(me.dialog_items.find(function(i) { return i.barcode == id})), 1);
+
+					me.apply_pricing_rule();
+					me.discount_amount_applied = false;
+					me._calculate_taxes_and_totals();
+					me.calculate_discount_amount();
+					me.show_items_in_item_cart();
+					me.refresh(true);	
+
+					me.render_items_in_dialog();
 				});
 		}	
 
 			// dialog_items_html = frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items});
 			// cur_dialog.fields_dict.scanned_items.set_value(dialog_items_html);
 	},
-	calculate_amt: function(){
+	calculate_item_total: function(){
 		var me=this;
+		var total = 0.0;
 		for(i=0;i<me.dialog_items.length;i++){
-			
+			total = total + me.dialog_items[i].amt;
 		}
+		return total;
 	},
+
 
 	// Below is the code from develop branch
 	make_dialog_search: function(parent) {
