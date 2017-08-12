@@ -2,5 +2,8 @@
 	"css/jmi.min.css": [
 		"public/css/jmi_pos.css",
 		"public/css/jmi.css"
+	],
+	"js/jmi.min.js": [
+		"public/js/jmi_scanned_items.html"
 	]
 }
