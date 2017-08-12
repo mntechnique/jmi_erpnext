@@ -31,14 +31,14 @@
 	position: relative !important;
 }
 
-.pos .image-field {
+/*.pos .image-field {
 	display: none !important;
-}
+}*/
 
-.pos .image-view-container {
+/*.pos .image-view-container {
 	display: list-item !important;
 	flex-wrap: wrap !important;
-}
+}*/
 
 .pos .dropdown-text {
 	color: #6c7680 !important;
