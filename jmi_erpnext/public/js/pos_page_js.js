@@ -5,247 +5,59 @@ jmi.pos = {};
 jmi.pos.super = erpnext.pos.PointOfSale.prototype;
 
 erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
-	init: function (wrapper) {
-		jmi.pos.super.init(wrapper);
-		this.add_scanner();
-		this.dialog_items = [];
-		this.render_items_in_dialog();
-	},
-	make_new_cart: function() {
-		jmi.pos.super.make_new_cart();
-		this.add_scanner();
-	},	
-	add_scanner: function() {
+
+	make_search: function () {
 		var me = this;
-		
-		me.page.set_secondary_action("Scanner", function(){
-			var dialog = new frappe.ui.Dialog({
-				title: __("New Items"),
-				fields: [
-					{fieldtype: "Data", fieldname: "barcode_no", label: __("Barcode Number")},
-					{fieldtype: "HTML", fieldname: "scanned_items", label: __("Items List"), readonly:1}
-				]
-			});
-			dialog.fields_dict.barcode_no.$input.on("keydown",function(event) { 
-				if ((dialog.fields_dict.barcode_no.$input.val() != "") && (event.which == 13)){
-					event.preventDefault();
-					var item = me.items.filter(function(i) { return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
-					var existing_item = me.dialog_items.filter(function(i) {return i.barcode === dialog.fields_dict.barcode_no.$input.val()});
-
-					if (item.length > 0) {
-						if(existing_item.length == 0) {
-							item[0]["rate"] = me.price_list_data[item[0]["item_code"]];
-							item[0]["qty"] = 1;
-							item[0]["amt"] = item[0]["rate"] * item[0]["qty"];
-							me.dialog_items.push(item[0]);
-
-							me.get_items(item[0]["item_code"]);
-						} else {
-							existing_item[0].qty += 1;
-							existing_item[0]["amt"] = existing_item[0]["rate"] * existing_item[0]["qty"];
-						}
-					}
-
-					me.render_items_in_dialog();
-					dialog.fields_dict.barcode_no.set_value();
-				}				
-			});
-
-
-	// Code from develop branch
-	
-	// },
-	// add_scanner: function() {
-	// 	var me = this;
-
-	// 	me.page.add_menu_item(__("Scanner"), function () {
-	// 		var dialog = new frappe.ui.Dialog({
-	// 			title: __("New Items"),
-	// 			fields: [
-	// 				{fieldtype: "HTML", fieldname: "barcode_no", label: __("Barcode Number")},
-	// 				{fieldtype: "HTML", fieldname: "scanned_items", label: __("Items List"), readonly:1}
-	// 			]
-	// 		});
-			
-	// 		me.make_dialog_search(dialog.fields_dict["barcode_no"].$wrapper);
-
-			dialog.set_primary_action(__("Save"), function() {
-				for(var i=0;i<me.dialog_items.length;i++){					
-					var existing_cart_items = me.frm.doc.items.filter(function(j) {return j.item_code === me.dialog_items[i].item_code});
-					if(existing_cart_items.length > 0) {
-						existing_cart_items[0].qty = existing_cart_items[0].qty + me.dialog_items[i].qty;
-					}else{
-						me.frm.doc.items.push(me.dialog_items[i]);
-					}
-				}
-				
-				me.apply_pricing_rule();
-				me.discount_amount_applied = false;
-				me._calculate_taxes_and_totals();
-				me.calculate_discount_amount();
-				me.show_items_in_item_cart();
-				me.refresh(true);
-
-				me.dialog_items = [];
-				dialog.clear(); dialog.hide();				
-			});
-			dialog.show();
-			dialog.has_primary_action = false;
-		}, "fa fa-barcode", true);
-	},
-	render_items_in_dialog: function() {
-		var me = this;
-		if (cur_dialog) {
-			$(cur_dialog.fields_dict['scanned_items'].wrapper)
-			.html(frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items,"items_total":me.calculate_item_total()}))
-
-				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".item_name").on("click",function(e){
-					//enables the input field
-					$(this).parent().parent('tr').children('.qty_td').children('.qty').removeAttr("disabled");
-					//shows save-check icon
-					$(this).parent().parent('tr').children('td').children('.fa-check-square').removeClass("hidden");
-					//hides the delete icon
-					$(this).parent().parent('tr').children('td').children('.fa-times').addClass("hidden");
-				});
-				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".save_check").on("click",function(){
-					//disables the field
-					$(this).parent().parent('tr').children('.qty_td').children('.qty').attr("disabled","true");
-					//hides the save-check icon
-					$(this).parent().parent('tr').children('td').children('.fa-check-square').addClass("hidden");
-					//shows the delete icon
-					$(this).parent().parent('tr').children('td').children('.fa-times').removeClass("hidden");					
-
-					//edits the changed dialog item
-					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
-					
-					var existing_dialog_item = me.dialog_items.find(function(item) {return id === item.barcode});
-
-					existing_dialog_item.qty = $(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value;
-					existing_dialog_item.amt = (existing_dialog_item.qty)*(existing_dialog_item.rate);
-
-					me.apply_pricing_rule();
-					me.discount_amount_applied = false;
-					me._calculate_taxes_and_totals();
-					me.calculate_discount_amount();
-					me.show_items_in_item_cart();
-					me.refresh(true);
-					me.render_items_in_dialog();
-				});
-
-				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".qty_increment").on("click",function(){
-
-					//edits the changed dialog item
-					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
-					
-					var existing_dialog_item = me.dialog_items.find(function(item) {return id === item.barcode});
-
-					existing_dialog_item.qty = parseInt($(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value) + 1;
-					existing_dialog_item.amt = (existing_dialog_item.qty)*(existing_dialog_item.rate);
-
-					me.apply_pricing_rule();
-					me.discount_amount_applied = false;
-					me._calculate_taxes_and_totals();
-					me.calculate_discount_amount();
-					me.show_items_in_item_cart();
-					me.refresh(true);
-					me.render_items_in_dialog();
-				});
-
-				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".qty_decrement").on("click",function(){
-
-					//edits the changed dialog item
-					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
-					
-					var existing_dialog_item = me.dialog_items.find(function(item) {return id === item.barcode});
-
-					existing_dialog_item.qty = parseInt($(this).parent().parent('tr').children('.qty_td').children('.qty')[0].value) - 1;
-					if(existing_dialog_item.qty == 0){
-						me.dialog_items.splice(me.dialog_items.indexOf(me.dialog_items.find(function(i) { return i.barcode == id})), 1);
-					}else{
-						existing_dialog_item.amt = (existing_dialog_item.qty)*(existing_dialog_item.rate);
-					}
-					me.apply_pricing_rule();
-					me.discount_amount_applied = false;
-					me._calculate_taxes_and_totals();
-					me.calculate_discount_amount();
-					me.show_items_in_item_cart();
-					me.refresh(true);
-					me.render_items_in_dialog();
-				});				
-
-				$(cur_dialog.fields_dict['scanned_items'].wrapper).find(".del_item").on("click",function(e){
-					var id = $(this).parent().parent('tr').children('td').children('.item_name')[0].id;
-					me.dialog_items.splice(me.dialog_items.indexOf(me.dialog_items.find(function(i) { return i.barcode == id})), 1);
-
-					me.apply_pricing_rule();
-					me.discount_amount_applied = false;
-					me._calculate_taxes_and_totals();
-					me.calculate_discount_amount();
-					me.show_items_in_item_cart();
-					me.refresh(true);	
-					me.render_items_in_dialog();
-				});
-		}	
-
-			// dialog_items_html = frappe.render_template("jmi_scanned_items", {"particulars": me.dialog_items});
-			// cur_dialog.fields_dict.scanned_items.set_value(dialog_items_html);
-	},
-	calculate_item_total: function(){
-		var me=this;
-		var total = 0.0;
-		for(i=0;i<me.dialog_items.length;i++){
-			total = total + me.dialog_items[i].amt;
-		}
-		return total;
-	},
-
-
-	// Below is the code from develop branch
-	make_dialog_search: function(parent) {
-		var me = this;
-		me.dialog_search = frappe.ui.form.make_control({
+		this.serach_item = frappe.ui.form.make_control({
 			df: {
 				"fieldtype": "Data",
 				"label": "Item",
-				"fieldname": "dialog_item",
+				"fieldname": "pos_item",
 				"placeholder": __("Search Item")
 			},
-			parent: parent,
-			only_input: true
+			parent: this.wrapper.find(".search-item"),
+			only_input: true,
 		});
 
-		me.dialog_search.make_input();
-
-		me.dialog_search.$input.on("keyup", function (e) {
-			var keyCode = e.keyCode || e.which;
-
-			if ((me.dialog_search.$input.val() != "") && (keyCode == 13)){
-
-				var item = me.items.filter(function(i) { return i.barcode === me.dialog_search.$input.val()});
-				var existing_item = me.dialog_items.filter(function(i) {return i.barcode === me.dialog_search.$input.val()});
-
-				if (item.length > 0) {
-					if(existing_item.length == 0) {
-						item[0]["rate"] = me.price_list_data[item[0]["item_code"]];
-						item[0]["qty"] = 1;
-						item[0]["amt"] = item[0]["rate"] * item[0]["qty"];
-						me.dialog_items.push(item[0]);
-
-						me.get_items(item[0]["item_code"]);
-					} else {
-						existing_item[0].qty += 1;
-						existing_item[0]["amt"] = existing_item[0]["rate"] * existing_item[0]["qty"];
-					}
-				}
-
-				me.render_items_in_dialog();
-				me.dialog_search.$input.val();
-			}				
+		this.serach_item.make_input();
+		this.serach_item.$input.on("keypress", function (event) {
+			console.log(event)
+			console.log(me.serach_item)
+			if((me.serach_item.$input.val() != "") && (event.which == 13)){
+				console.log("inside if")
+				me.items = me.get_items();
+				me.make_item_list();
+			}
 		});
-	},
-	make_menu_list: function() {
-		var me = this;
-		jmi.pos.super.make_menu_list();
-		this.add_scanner();
+
+		this.search_item_group = this.wrapper.find('.search-item-group');
+		sorted_item_groups = this.get_sorted_item_groups()
+		var dropdown_html = sorted_item_groups.map(function(item_group) {
+			return "<li><a class='option' data-value='"+item_group+"'>"+item_group+"</a></li>";
+		}).join("");
+
+		this.search_item_group.find('.dropdown-menu').html(dropdown_html);
+
+		this.search_item_group.on('click', '.dropdown-menu a', function() {
+			me.selected_item_group = $(this).attr('data-value');
+			me.search_item_group.find('.dropdown-text').text(me.selected_item_group);
+
+			me.page_len = 20;
+			me.items = me.get_items();
+			me.make_item_list();
+		})
+
+		me.toggle_more_btn();
+
+		this.wrapper.on("click", ".btn-more", function() {
+			me.page_len += 20;
+			me.items = me.get_items();
+			me.make_item_list();
+			me.toggle_more_btn();
+		});
+
+		this.page.wrapper.on("click", ".edit-customer-btn", function() {
+			me.update_customer()
+		})
 	}
-})
+})	
