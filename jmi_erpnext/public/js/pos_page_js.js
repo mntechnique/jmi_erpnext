@@ -23,7 +23,7 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		this.serach_item.$input.on("keypress", function (event) {
 			console.log(event)
 			console.log(me.serach_item)
-			if((me.serach_item.$input.val() != "") && (event.which == 13)){
+			if((me.serach_item.$input.val() != "") || (event.which == 13)){
 				console.log("inside if")
 				me.items = me.get_items();
 				me.make_item_list();
