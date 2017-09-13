@@ -86,6 +86,14 @@ page_js = {"pos" : "public/js/pos_page_js.js"}
 #	}
 # }
 
+doc_events = {
+	"Item": {
+		"after_insert": "jmi_erpnext.item_data_export.export_item_sheets",
+		"on_update": "jmi_erpnext.item_data_export.export_item_sheets",
+		"on_trash": "jmi_erpnext.item_data_export.export_item_sheets"
+	}
+}
+
 # Scheduled Tasks
 # ---------------
 
@@ -106,6 +114,12 @@ page_js = {"pos" : "public/js/pos_page_js.js"}
 # 		"jmi_erpnext.tasks.monthly"
 # 	]
 # }
+
+scheduler_events = {
+	"hourly": [
+		"jmi_erpnext.item_data_export.export_item_sheets"
+	]
+}
 
 # Testing
 # -------
