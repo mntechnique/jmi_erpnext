@@ -86,13 +86,13 @@ page_js = {"pos" : "public/js/pos_page_js.js"}
 #	}
 # }
 
-doc_events = {
-	"Item": {
-		"after_insert": "jmi_erpnext.item_data_export.export_item_sheets",
-		"on_update": "jmi_erpnext.item_data_export.export_item_sheets",
-		"on_trash": "jmi_erpnext.item_data_export.export_item_sheets"
-	}
-}
+# doc_events = {
+# 	"Item": {
+# 		"after_insert": "jmi_erpnext.item_data_export.export_item_sheets",
+# 		"on_update": "jmi_erpnext.item_data_export.export_item_sheets",
+# 		"on_trash": "jmi_erpnext.item_data_export.export_item_sheets"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
