@@ -111,10 +111,14 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					
 					if(d.customer_name) {
 						var addx = me.address[d.customer_name];
-						// console.log(addx);
 						html += '<br><span class="text-muted ellipsis">' + __(d.customer_name) + '</span>';
 						if (addx) {
-							html += '<br><span class="text-muted ellipsis">' + __(addx.address_line1) + '</span>';
+							html += '<br><div class="text-muted ellipsis">' 
+							html +=	addx.address_line1 ? __(addx.address_line1) + "<br>" : ""
+							html +=	addx.address_line2 ? __(addx.address_line2) + "<br>" : ""
+							html += addx.city ? __(addx.city) + "<br>" : "",
+							html += addx.state ? __(addx.state) : ""
+							+ '</div>';
 						}
 					}
 
@@ -173,77 +177,92 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 	},	
 
-	prepare_customer_mapper: function(key) {
+	// prepare_customer_mapper: function(key) {
 
-		var me = this;
-		var customer_data = '';
+	// 	var me = this;
+	// 	var customer_data = '';
 
-		if (key) {
-			key = key.toLowerCase().trim();
-			var re = new RegExp('%', 'g');
-			var reg = new RegExp(key.replace(re, '\\w*\\s*[a-zA-Z0-9]*'));
+	// 	if (key) {
+	// 		key = key.toLowerCase().trim();
+	// 		var re = new RegExp('%', 'g');
+	// 		var reg = new RegExp(key.replace(re, '\\w*\\s*[a-zA-Z0-9]*'));
 
-			customer_data =  $.grep(this.customers, function(data) {
-				contact = me.contacts[data.name];
-				address = me.address[data.name]; //New
-				console.log(address)
 
-				if(reg.test(data.name.toLowerCase())
-					|| reg.test(data.customer_name.toLowerCase())
-					|| (contact && reg.test(contact["mobile_no"]))
-					|| (contact && reg.test(contact["phone"]))
-					|| (address && reg.test(address["address_line1"])) //New
-					|| (data.customer_group && reg.test(data.customer_group.toLowerCase()))){
-						return data;
-				}
-			})
-		} else {
-			customer_data = this.customers;
-		}
+	// 		customer_data =  $.grep(this.customers, function(data) {
+	// 			contact = me.contacts[data.name];
+	// 			address = me.address[data.name]; //New
+	// 			// console.log("AL1: ", address["address_line1"], "Reg: ", reg.test(address["address_line1"]));
+	// 			// console.log("AL2: ", address["address_line2"], "Reg: ", reg.test(address["address_line1"]));
+	// 			// console.log("City: ", address["city"], "Reg: ", reg.test(address["city"]));
+	// 			// console.log("State: ", address["state"], "Reg: ", reg.test(address["state"]));
+				
+	// 			if(reg.test(data.name.toLowerCase())
+	// 				|| reg.test(data.customer_name.toLowerCase())
+	// 				|| (contact && reg.test(contact["mobile_no"]))
+	// 				|| (contact && reg.test(contact["phone"]))
+	// 				|| (address && reg.test(address["address_line1"])) //New
+	// 				|| (address && reg.test(address["address_line2"])) //New
+	// 				|| (address && reg.test(address["city"])) //New
+	// 				|| (address && reg.test(address["state"])) //New
+	// 				|| (data.customer_group && reg.test(data.customer_group.toLowerCase()))) {
+	// 					return data;
+	// 			}
+	// 		})
+	// 	} else {
+	// 		console.log("NOT FOUND", key);
+	// 		customer_data = this.customers;
+	// 	}
 
-		this.customers_mapper = [];
+	// 	this.customers_mapper = [];
 
-		customer_data.forEach(function (c, index) {
-			if(index < 30) {
-				contact = me.contacts[c.name];
-				address = me.address[c.name]; //New
+	// 	customer_data.forEach(function (c, index) {
+	// 		if(index < 30) {
+	// 			contact = me.contacts[c.name];
+	// 			address = me.address[c.name]; //New
 
-				if(contact && !c['phone']) {
-					c["phone"] = contact["phone"];
-					c["email_id"] = contact["email_id"];
-					c["mobile_no"] = contact["mobile_no"];
-				}
-				if(address && !c['address_line1']) {
-					c["address_line1"] = address["address_line1"];
-				}
+	// 			if(contact && !c['phone']) {
+	// 				c["phone"] = contact["phone"];
+	// 				c["email_id"] = contact["email_id"];
+	// 				c["mobile_no"] = contact["mobile_no"];
+	// 			}
+				
+	// 			if(address) {
+	// 				c["address_line1"] = address["address_line1"];
+	// 				c["address_line2"] = address["address_line2"];
+	// 				c["city"] = address["city"];
+	// 				c["state"] = address["state"];
+	// 			}
 
-				me.customers_mapper.push({
-					label: c.name,
-					value: c.name,
-					customer_name: c.customer_name,
-					customer_group: c.customer_group,
-					territory: c.territory,
-					phone: contact ? contact["phone"] : '',
-					mobile_no: contact ? contact["mobile_no"] : '',
-					email_id: contact ? contact["email_id"] : '',
-					address_line1: address ? address["address_line1"]: '', //New
-					searchtext: ['customer_name', 'customer_group', 'name', 'value',
-						'label', 'email_id', 'phone', 'mobile_no', 'address_line1'] //New
-						.map(key => c[key]).join(' ')
-						.toLowerCase()
-				});
-			} else {
-				return;
-			}
-		});
+	// 			me.customers_mapper.push({
+	// 				label: c.name,
+	// 				value: c.name,
+	// 				customer_name: c.customer_name,
+	// 				customer_group: c.customer_group,
+	// 				territory: c.territory,
+	// 				phone: contact ? contact["phone"] : '',
+	// 				mobile_no: contact ? contact["mobile_no"] : '',
+	// 				email_id: contact ? contact["email_id"] : '',
+	// 				address_line1: address ? c.address_line1 : '', //New
+	// 				address_line2: address ? c.address_line2 : '', //New
+	// 				city: address ? c.city : '', //New
+	// 				state: address ? c.state : '', //New
+	// 				searchtext: ['customer_name', 'customer_group', 'name', 'value',
+	// 					'label', 'email_id', 'phone', 'mobile_no', 'address_line1', 'address_line2', 'city', 'state'] //New
+	// 					.map(key => c[key]).join(' ')
+	// 					.toLowerCase()
+	// 			});
+	// 		} else {
+	// 			return;
+	// 		}
+	// 	});
 
-		this.customers_mapper.push({
-			label: "<span class='text-primary link-option'>"
-			+ "<i class='fa fa-plus' style='margin-right: 5px;'></i> "
-			+ __("Create a new Customer")
-			+ "</span>",
-			value: 'is_action',
-			action: me.add_customer
-		});
-	},
+	// 	this.customers_mapper.push({
+	// 		label: "<span class='text-primary link-option'>"
+	// 		+ "<i class='fa fa-plus' style='margin-right: 5px;'></i> "
+	// 		+ __("Create a new Customer")
+	// 		+ "</span>",
+	// 		value: 'is_action',
+	// 		action: me.add_customer
+	// 	});
+	// },
 })	
