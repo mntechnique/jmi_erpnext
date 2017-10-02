@@ -108,9 +108,9 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				item: function (item, input) {
 					var d = this.get_item(item.value);
 					var html = "<span>" + __(d.label || d.value) + "</span>";
-					
+
 					if(d.customer_name) {
-						var addx = me.address[d.customer_name];
+						var addx = me.address[d.value];
 						html += '<br><span class="text-muted ellipsis">' + __(d.customer_name) + '</span>';
 						if (addx) {
 							html += '<br><div class="text-muted ellipsis">' 
@@ -175,7 +175,7 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 					$(this).val("");
 				}
 			});
-	},	
+	},
 
 	// prepare_customer_mapper: function(key) {
 
@@ -265,4 +265,4 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 	// 		action: me.add_customer
 	// 	});
 	// },
-})	
+})
