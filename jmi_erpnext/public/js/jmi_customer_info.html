@@ -1,0 +1,25 @@
+<div class="row customer-info">
+	<div class="col-xs-12">
+		<ul class="list-unstyled">
+			<li>{{ customer_info.customer.customer_name }}</li>
+			{% if (customer_info.address) { %}
+				<li>{{ customer_info.address.address_line1 }}</li>
+				{% if (customer_info.address.address_line2) { %}
+					<li>{{ customer_info.address.address_line2 }}</li>
+				{% } %}
+				{% if (customer_info.address.county) { %}
+					<li>{{ customer_info.address.county }}</li>
+				{% } %}
+				{% if (customer_info.address.city) { %}
+					<li>{{ customer_info.address.city }}</li>
+				{% } %}
+				{% if (customer_info.address.state) { %}
+					<li>{{ customer_info.address.state }}</li>
+				{% } %}
+				{% if (customer_info.address.pincode) { %}
+					<li>{{ customer_info.address.pincode }}</li>
+				{% } %}
+			{% } %}
+		</ul>
+	</div>
+</div>

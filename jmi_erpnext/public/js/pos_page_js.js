@@ -153,9 +153,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				me.update_customer_data(customer);
 				me.refresh();
 				me.set_focus();
-
-				console.log("CUSTOMER SELECTED", customer.customer_name, "me", me.address[customer.customer_name]);
-				console.log("PAGE", me);
 				me.render_customer_info(customer);
 
 				me.list_customers_btn.removeClass("view_customer");
@@ -184,17 +181,13 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 	render_customer_info: function(customer) {
 		var me = this;
 		var address = me.address[customer.customer_name];
-		
-		var html = "<div id='customer-info'> <span>Customer Name:" 
-		+ customer.customer_name 
-		
-		if (address) { html += " </span> <span>Address:" + address.address_line1 + " </span> "};
 
-		html += "</div>";
-
+		var customer_info = {"customer": customer, "address": address};
+		
+		var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 		debugger;
 
-		$("#customer-info").remove();
+		$(".customer-info").remove();
 		me.page.wrapper.find(".pos").prepend(html);
 	},
 
