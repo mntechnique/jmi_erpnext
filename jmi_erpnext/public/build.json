@@ -4,6 +4,7 @@
 		"public/css/jmi.css"
 	],
 	"js/jmi.min.js": [
-		"public/js/jmi_scanned_items.html"
+		"public/js/jmi_scanned_items.html",
+		"public/js/jmi_customer_info.html"
 	]
 }
