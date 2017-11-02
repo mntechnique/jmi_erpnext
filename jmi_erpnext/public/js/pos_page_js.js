@@ -183,9 +183,9 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		var address = me.address[customer.customer_name];
 
 		var customer_info = {"customer": customer, "address": address};
+		console.log("Cust INFO", customer_info)
 		
 		var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
-		debugger;
 
 		$(".customer-info").remove();
 		me.page.wrapper.find(".pos").prepend(html);

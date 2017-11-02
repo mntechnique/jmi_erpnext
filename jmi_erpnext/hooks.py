@@ -97,7 +97,7 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+# scheduler_even	ts = {
 # 	"all": [
 # 		"jmi_erpnext.tasks.all"
 # 	],
@@ -133,3 +133,11 @@ scheduler_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "jmi_erpnext.event.get_events"
 # }
 
+fixtures = [
+	{
+		"dt":"Custom Field",
+		"filters":[
+			["name", "in", ["Customer-sb_jmi_customer_id","Customer-jmi_customer_id"]]
+		]
+	}
+]

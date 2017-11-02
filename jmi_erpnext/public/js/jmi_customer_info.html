@@ -1,25 +1,26 @@
 <div class="row customer-info">
 	<div class="col-xs-12">
-		<ul class="list-unstyled">
-			<li>{{ customer_info.customer.customer_name }}</li>
-			{% if (customer_info.address) { %}
-				<li>{{ customer_info.address.address_line1 }}</li>
-				{% if (customer_info.address.address_line2) { %}
-					<li>{{ customer_info.address.address_line2 }}</li>
-				{% } %}
-				{% if (customer_info.address.county) { %}
-					<li>{{ customer_info.address.county }}</li>
-				{% } %}
-				{% if (customer_info.address.city) { %}
-					<li>{{ customer_info.address.city }}</li>
-				{% } %}
-				{% if (customer_info.address.state) { %}
-					<li>{{ customer_info.address.state }}</li>
-				{% } %}
-				{% if (customer_info.address.pincode) { %}
-					<li>{{ customer_info.address.pincode }}</li>
-				{% } %}
-			{% } %}
-		</ul>
+		<div class="panel">
+			<div class="panel-body">
+			<h4>Customer ID: {{ customer_info.customer.jmi_customer_id || "ID not defined" }}</h4>
+			
+			{% 
+				if (customer_info.address) { 
+				
+					arr_add = customer_info.address.address_line1;
+					if (customer_info.address.address_line2) {
+						arr_add = arr_add + ", " + customer_info.address.address_line2;
+					}
+				}
+
+			%}
+			<h4>
+				Address:
+			{{ arr_add }}
+			</h4>
+		
+			</div>
+		</div>
 	</div>
 </div>
+	
