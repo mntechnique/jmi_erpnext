@@ -1,23 +1,39 @@
-<div class="row customer-info">
+<div class="row customer-info hidden-xs">
 	<div class="col-xs-12">
 		<div class="panel">
-			<div class="panel-body">
-			<h4>Customer ID: {{ customer_info.customer.jmi_customer_id || "ID not defined" }}</h4>
+			<div class="panel-body"  style="background-color: #f5f7fa;margin-top:5px;">
+
+			
+			<p style="font-size: 18px;">Customer ID:
+			 <span style="font-size: 16px; font-weight: normal;">{% if(customer_info.cust_id == null)
+			{
+			%}{{ "ID not defined" }}
+			{% }else{ %}
+
+			{{ customer_info.cust_id }}
+			{%}%}</span>
+			</p>
 			
 			{% 
-				if (customer_info.address) { 
+				if (customer_info.address.address_line1 != null) { 
 				
 					arr_add = customer_info.address.address_line1;
 					if (customer_info.address.address_line2) {
 						arr_add = arr_add + ", " + customer_info.address.address_line2;
 					}
+				}else
+				{
+					arr_add = "Address not specified";
 				}
 
 			%}
-			<h4>
+
+			<p style="font-size: 18px;">
 				Address:
-			{{ arr_add }}
-			</h4>
+				<span style="font-size: 16px; font-weight: normal;">	
+					{{ arr_add }}
+				</span>
+			</p>
 		
 			</div>
 		</div>
