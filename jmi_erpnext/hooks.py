@@ -139,5 +139,6 @@ fixtures = [
 		"filters":[
 			["name", "in", ["Customer-sb_jmi_customer_id","Customer-jmi_customer_id"]]
 		]
-	}
+	},
+	{"dt": "Print Format", "filters": [["name", "in", ["Point of Sale"]]]},
 ]

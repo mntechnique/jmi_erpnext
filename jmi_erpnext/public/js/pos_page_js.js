@@ -188,6 +188,7 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			},
 			callback: function(r){
 				var address = me.address[customer.customer_name];
+				me.frm.doc["address"] = address; 
 				var custm_id = r.message;
 
 				 var customer_info = {
@@ -195,11 +196,7 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				 	"address": address,
 					"cust_id" : custm_id
 				 };
-				
-				console.log("Cust INFO", customer_info)
-
-
-				
+								
 				var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 
 				$(".customer-info").remove();
@@ -208,6 +205,21 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		})
 		
 	},
+	set_primary_action: function () {
+		var me = this;
+		this.page.set_primary_action(__("New Cart"), function () {
+			me.make_new_cart()
+			me.make_menu_list()
+		}, "fa fa-plus")
+
+		this.page.set_secondary_action(__("Print"), function () {
+			var html = frappe.render(me.print_template_data, me.frm.doc)
+			me.print_document(html)
+		})
+		this.page.add_menu_item(__("Email"), function () {
+			me.email_prompt()
+		})
+	}
 
 	// prepare_customer_mapper: function(key) {
 
