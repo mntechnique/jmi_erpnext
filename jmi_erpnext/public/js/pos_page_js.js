@@ -153,7 +153,11 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				me.update_customer_data(customer);
 				me.refresh();
 				me.set_focus();
-				me.fetch_and_render_customer_info(customer);
+				me.frm.doc["offline_pos_name"] = null;
+				me.frm.doc["address"] = null;
+				if(me.pos_profile_data.jmi_show_customer_details == 1){
+					me.fetch_and_render_customer_info(customer);
+				}
 
 				me.list_customers_btn.removeClass("view_customer");
 			})
@@ -179,7 +183,6 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			});
 	},
 	fetch_and_render_customer_info: function(customer) {
-		console.log("Customer", customer);
 		var me = this;
 		frappe.call({
 			method: "jmi_erpnext.api.jmi_get_customer_information",
@@ -188,7 +191,7 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			},
 			callback: function(r){
 				var address = me.address[customer.customer_name];
-				me.frm.doc["address"] = address; 
+				me.frm.doc["address"] = address;
 				var custm_id = r.message;
 
 				 var customer_info = {
@@ -200,9 +203,10 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 
 				$(".customer-info").remove();
-				me.page.wrapper.find(".pos").prepend(html);		
+				me.page.wrapper.find(".pos").prepend(html);
 			}
 		})
+		
 		
 	},
 	set_primary_action: function () {
