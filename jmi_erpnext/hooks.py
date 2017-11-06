@@ -137,9 +137,16 @@ fixtures = [
 	{
 		"dt":"Custom Field",
 		"filters":[
-			["name", "in", ["Customer-sb_jmi_customer_id","Customer-jmi_customer_id"]],
-			["name", "in", ["POS Profile-jmi_pos_settings","POS Profile-jmi_show_customer_details"]]
+			["name", "in", [
+			"Customer-sb_jmi_customer_id",
+			"Customer-jmi_customer_id",
+			"POS Profile-jmi_pos_settings",
+			"POS Profile-jmi_show_customer_details"]],
 		]
 	},
-	{"dt": "Print Format", "filters": [["name", "in", ["Point of Sale"]]]},
+	{"dt": "Print Format", "filters": [["name", "in", ["JMI Point of Sale"]]]},
+	{"dt": "Property Setter", "filters": [["name", "in", [
+		"POS Profile-print_format-default",
+		"POS Profile-print_format_for_online-default"
+	]]]},
 ]
