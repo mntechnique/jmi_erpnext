@@ -192,6 +192,17 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 			callback: function(r){
 				var address = me.address[customer.customer_name];
 				me.frm.doc["address"] = address;
+
+				
+				
+				$(".po-no").blur(function () {
+					console.log("pono");
+					// // if(event.which == 13){
+					// 	me.frm.doc["purchase_order_no"] = $(".po_no").val();
+					// 	console.log(me.frm.doc.purchase_order_no)
+					// // }
+				});
+
 				var custm_id = r.message;
 
 				 var customer_info = {
@@ -201,6 +212,9 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				 };
 								
 				var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
+
+				var customer_info = $(".customer-info");
+				console.log("customer info", customer_info);
 
 				$(".customer-info").remove();
 				me.page.wrapper.find(".pos").prepend(html);
