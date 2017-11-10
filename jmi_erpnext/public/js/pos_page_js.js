@@ -153,7 +153,11 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				me.update_customer_data(customer);
 				me.refresh();
 				me.set_focus();
-				me.render_customer_info(customer);
+				me.frm.doc["offline_pos_name"] = null;
+				me.frm.doc["address"] = null;
+				if(me.pos_profile_data.jmi_show_customer_details == 1){
+					me.fetch_and_render_customer_info(customer);
+				}
 
 				me.list_customers_btn.removeClass("view_customer");
 			})
@@ -178,18 +182,62 @@ erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 				}
 			});
 	},
-	render_customer_info: function(customer) {
+	fetch_and_render_customer_info: function(customer) {
 		var me = this;
-		var address = me.address[customer.customer_name];
+		frappe.call({
+			method: "jmi_erpnext.api.jmi_get_customer_information",
+			args:{
+				"customer_name": customer.customer_name
+			},
+			callback: function(r){
+				var address = me.address[customer.customer_name];
+				me.frm.doc["address"] = address;
 
-		var customer_info = {"customer": customer, "address": address};
+				
+				
+				$(".po-no").blur(function () {
+					console.log("pono");
+					// // if(event.which == 13){
+					// 	me.frm.doc["purchase_order_no"] = $(".po_no").val();
+					// 	console.log(me.frm.doc.purchase_order_no)
+					// // }
+				});
+
+				var custm_id = r.message;
+
+				 var customer_info = {
+				 	"customer": customer, 
+				 	"address": address,
+					"cust_id" : custm_id
+				 };
+								
+				var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
+
+				var customer_info = $(".customer-info");
+				console.log("customer info", customer_info);
+
+				$(".customer-info").remove();
+				me.page.wrapper.find(".pos").prepend(html);
+			}
+		})
 		
-		var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
-		debugger;
-
-		$(".customer-info").remove();
-		me.page.wrapper.find(".pos").prepend(html);
+		
 	},
+	set_primary_action: function () {
+		var me = this;
+		this.page.set_primary_action(__("New Cart"), function () {
+			me.make_new_cart()
+			me.make_menu_list()
+		}, "fa fa-plus")
+
+		this.page.set_secondary_action(__("Print"), function () {
+			var html = frappe.render(me.print_template_data, me.frm.doc)
+			me.print_document(html)
+		})
+		this.page.add_menu_item(__("Email"), function () {
+			me.email_prompt()
+		})
+	}
 
 	// prepare_customer_mapper: function(key) {
 

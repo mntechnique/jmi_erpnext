@@ -97,7 +97,7 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+# scheduler_even	ts = {
 # 	"all": [
 # 		"jmi_erpnext.tasks.all"
 # 	],
@@ -133,3 +133,20 @@ scheduler_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "jmi_erpnext.event.get_events"
 # }
 
+fixtures = [
+	{
+		"dt":"Custom Field",
+		"filters":[
+			["name", "in", [
+			"Customer-sb_jmi_customer_id",
+			"Customer-jmi_customer_id",
+			"POS Profile-jmi_pos_settings",
+			"POS Profile-jmi_show_customer_details"]],
+		]
+	},
+	{"dt": "Print Format", "filters": [["name", "in", ["JMI Point of Sale"]]]},
+	{"dt": "Property Setter", "filters": [["name", "in", [
+		"POS Profile-print_format-default",
+		"POS Profile-print_format_for_online-default"
+	]]]},
+]

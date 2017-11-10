@@ -1,25 +1,55 @@
-<div class="row customer-info">
-	<div class="col-xs-12">
-		<ul class="list-unstyled">
-			<li>{{ customer_info.customer.customer_name }}</li>
-			{% if (customer_info.address) { %}
-				<li>{{ customer_info.address.address_line1 }}</li>
-				{% if (customer_info.address.address_line2) { %}
-					<li>{{ customer_info.address.address_line2 }}</li>
-				{% } %}
-				{% if (customer_info.address.county) { %}
-					<li>{{ customer_info.address.county }}</li>
-				{% } %}
-				{% if (customer_info.address.city) { %}
-					<li>{{ customer_info.address.city }}</li>
-				{% } %}
-				{% if (customer_info.address.state) { %}
-					<li>{{ customer_info.address.state }}</li>
-				{% } %}
-				{% if (customer_info.address.pincode) { %}
-					<li>{{ customer_info.address.pincode }}</li>
-				{% } %}
-			{% } %}
-		</ul>
+<div class="row customer-info hidden-xs">
+	<div class="customer-info hidden-xs h6">
+		
+		<div class="col-xs-3">
+
+			<p style="font-size: 14px;">Customer ID:
+			 <span style="font-size: 12px; font-weight: normal;">{% if(customer_info.cust_id == null)
+			{
+			%}{{ "ID not defined" }}
+			{% }else{ %}
+
+			{{ customer_info.cust_id }}
+			{%}%}</span>
+			</p>
+
+		</div>
+
+		<div class="col-xs-6"> 
+
+			{% 
+				if (customer_info.address.address_line1 != null) { 
+				
+					arr_add = customer_info.address.address_line1;
+					if (customer_info.address.address_line2) {
+						arr_add = arr_add + ", " + customer_info.address.address_line2;
+					}
+				}else
+				{
+					arr_add = "Address not specified";
+				}
+
+			%}
+
+			<p style="font-size: 14px;">
+				Address:
+				<span style="font-size: 12px; font-weight: normal;">	
+					{{ arr_add }}
+				</span>
+			</p>
+
+		 </div>
+
+		<div class="col-xs-3"> 
+		<label>Purchase Order No. <input class="po-no form-control" value="" /> </label>
+		</div>	
+
+			
+			
+			
+			
+		
+			
 	</div>
 </div>
+	
