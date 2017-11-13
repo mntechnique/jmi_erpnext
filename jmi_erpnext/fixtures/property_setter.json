@@ -9,12 +9,12 @@
   "docstatus": 0, 
   "doctype": "Property Setter", 
   "doctype_or_field": "DocField", 
-  "field_name": "print_format_for_online", 
-  "modified": "2017-11-06 17:19:14.723837", 
-  "name": "POS Profile-print_format_for_online-default", 
+  "field_name": "print_format", 
+  "modified": "2017-11-06 17:19:14.743632", 
+  "name": "POS Profile-print_format-default", 
   "property": "default", 
   "property_type": "Text", 
-  "value": "JMI  Point of Sale"
+  "value": "JMI Point of Sale"
  }, 
  {
   "_assign": null, 
@@ -26,9 +26,9 @@
   "docstatus": 0, 
   "doctype": "Property Setter", 
   "doctype_or_field": "DocField", 
-  "field_name": "print_format", 
-  "modified": "2017-11-06 17:19:14.743632", 
-  "name": "POS Profile-print_format-default", 
+  "field_name": "print_format_for_online", 
+  "modified": "2017-11-12 23:10:00.868092", 
+  "name": "POS Profile-print_format_for_online-default", 
   "property": "default", 
   "property_type": "Text", 
   "value": "JMI Point of Sale"

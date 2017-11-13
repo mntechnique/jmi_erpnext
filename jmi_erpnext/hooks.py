@@ -23,7 +23,10 @@ app_include_js = "/assets/js/jmi.min.js"
 # web_include_js = "/assets/jmi_erpnext/js/jmi_erpnext.js"
 
 # include js in page
-page_js = {"pos" : "public/js/pos_page_js.js"}
+page_js = {
+	"pos" : "public/js/pos_page_js.js",
+	"point-of-sale" : "public/js/pos_page_js.js"
+}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
