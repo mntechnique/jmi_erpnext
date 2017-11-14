@@ -235,102 +235,14 @@ try {
 				me.email_prompt()
 			})
 		},
-
-		// prepare_customer_mapper: function(key) {
-
-		// 	var me = this;
-		// 	var customer_data = '';
-
-		// 	if (key) {
-		// 		key = key.toLowerCase().trim();
-		// 		var re = new RegExp('%', 'g');
-		// 		var reg = new RegExp(key.replace(re, '\\w*\\s*[a-zA-Z0-9]*'));
-
-
-		// 		customer_data =  $.grep(this.customers, function(data) {
-		// 			contact = me.contacts[data.name];
-		// 			address = me.address[data.name]; //New
-		// 			// console.log("AL1: ", address["address_line1"], "Reg: ", reg.test(address["address_line1"]));
-		// 			// console.log("AL2: ", address["address_line2"], "Reg: ", reg.test(address["address_line1"]));
-		// 			// console.log("City: ", address["city"], "Reg: ", reg.test(address["city"]));
-		// 			// console.log("State: ", address["state"], "Reg: ", reg.test(address["state"]));
-					
-		// 			if(reg.test(data.name.toLowerCase())
-		// 				|| reg.test(data.customer_name.toLowerCase())
-		// 				|| (contact && reg.test(contact["mobile_no"]))
-		// 				|| (contact && reg.test(contact["phone"]))
-		// 				|| (address && reg.test(address["address_line1"])) //New
-		// 				|| (address && reg.test(address["address_line2"])) //New
-		// 				|| (address && reg.test(address["city"])) //New
-		// 				|| (address && reg.test(address["state"])) //New
-		// 				|| (data.customer_group && reg.test(data.customer_group.toLowerCase()))) {
-		// 					return data;
-		// 			}
-		// 		})
-		// 	} else {
-		// 		console.log("NOT FOUND", key);
-		// 		customer_data = this.customers;
-		// 	}
-
-		// 	this.customers_mapper = [];
-
-		// 	customer_data.forEach(function (c, index) {
-		// 		if(index < 30) {
-		// 			contact = me.contacts[c.name];
-		// 			address = me.address[c.name]; //New
-
-		// 			if(contact && !c['phone']) {
-		// 				c["phone"] = contact["phone"];
-		// 				c["email_id"] = contact["email_id"];
-		// 				c["mobile_no"] = contact["mobile_no"];
-		// 			}
-					
-		// 			if(address) {
-		// 				c["address_line1"] = address["address_line1"];
-		// 				c["address_line2"] = address["address_line2"];
-		// 				c["city"] = address["city"];
-		// 				c["state"] = address["state"];
-		// 			}
-
-		// 			me.customers_mapper.push({
-		// 				label: c.name,
-		// 				value: c.name,
-		// 				customer_name: c.customer_name,
-		// 				customer_group: c.customer_group,
-		// 				territory: c.territory,
-		// 				phone: contact ? contact["phone"] : '',
-		// 				mobile_no: contact ? contact["mobile_no"] : '',
-		// 				email_id: contact ? contact["email_id"] : '',
-		// 				address_line1: address ? c.address_line1 : '', //New
-		// 				address_line2: address ? c.address_line2 : '', //New
-		// 				city: address ? c.city : '', //New
-		// 				state: address ? c.state : '', //New
-		// 				searchtext: ['customer_name', 'customer_group', 'name', 'value',
-		// 					'label', 'email_id', 'phone', 'mobile_no', 'address_line1', 'address_line2', 'city', 'state'] //New
-		// 					.map(key => c[key]).join(' ')
-		// 					.toLowerCase()
-		// 			});
-		// 		} else {
-		// 			return;
-		// 		}
-		// 	});
-
-		// 	this.customers_mapper.push({
-		// 		label: "<span class='text-primary link-option'>"
-		// 		+ "<i class='fa fa-plus' style='margin-right: 5px;'></i> "
-		// 		+ __("Create a new Customer")
-		// 		+ "</span>",
-		// 		value: 'is_action',
-		// 		action: me.add_customer
-		// 	});
-		// },
 	});
+
 } catch (e){ //online POS
 	class JMIPointOfSale extends erpnext.pos.PointOfSale {
 		constructor(wrapper){
 			super(wrapper);
 			console.log("extends!");
-		};
+		}
 		make() {
 			console.log("inside make");
 			return frappe.run_serially([
@@ -352,27 +264,97 @@ try {
 				},
 				() => this.page.set_title(__('Online Point of Sale'))
 			]);
-		};
+		}
 
-		// set_form_action() {
-		// 	console.log("Buttns");
-		// 	// if(this.frm.doc.docstatus){
-		// 		this.page.set_secondary_action(__("Print"), () => {
-		// 			// if (this.pos_profile && this.pos_profile.print_format_for_online) {
-		// 			// 	this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
-		// 			// }
-		// 			// this.frm.print_preview.printit(true);
-		// 		});
+		set_form_action() {
+			console.log("Buttons");
+			this.page.set_secondary_action(__("Print"), () => {
+				if (this.pos_profile && this.pos_profile.print_format_for_online) {
+					this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
+				}
+				this.frm.print_preview.printit(true);
+			});
 
-		// 		this.page.set_primary_action(__("New"), () => {
-		// 			// this.make_new_invoice();
-		// 		});
+			this.page.set_primary_action(__("New"), () => {
+				this.make_new_invoice();
+			});
 
-		// 		this.page.add_menu_item(__("Email"), () => {
-		// 			this.frm.email_doc();
-		// 		});
-		// 	// }	
-		// };
+			this.page.add_menu_item(__("Email"), () => {
+				this.frm.email_doc();
+			});
+		}
+
+		make_cart() {
+			this.cart = new POSCart({
+				frm: this.frm,
+				wrapper: this.wrapper.find('.cart-container'),
+				pos_profile: this.pos_profile,
+				events: {
+					on_customer_change: (customer) => {
+						this.frm.set_value('customer', customer),
+						console.log(this.frm.doc);
+						console.log(this.frm.doc.address_display);
+						this.fetch_and_render_customer_info(this.frm.doc);
+					},
+					on_field_change: (item_code, field, value) => {
+						this.update_item_in_cart(item_code, field, value);
+					},
+					on_numpad: (value) => {
+						if (value == 'Pay') {
+							if (!this.payment) {
+								this.make_payment_modal();
+							} else {
+								this.frm.doc.payments.map(p => {
+									this.payment.dialog.set_value(p.mode_of_payment, p.amount);
+								});
+
+								this.payment.set_title();
+							}
+							this.payment.open_modal();
+						}
+					},
+					on_select_change: () => {
+						this.cart.numpad.set_inactive();
+					},
+					get_item_details: (item_code) => {
+						return this.items.get(item_code);
+					}
+				}
+			});
+		}
+
+		fetch_and_render_customer_info(pos_doc) {
+			console.log(pos_doc)
+			var me = this;
+			frappe.call({
+				method: "jmi_erpnext.api.jmi_get_customer_information",
+				args:{
+					"customer_name": pos_doc.customer
+				},
+				callback: function(r){
+					var address = pos_doc.address_display;
+					// me.frm.doc["address"] = address;
+			
+					$(".po-no").blur(function () {
+						console.log("pono");
+					});
+
+					var customer_info = {
+					 	"customer": pos_doc.customer, 
+					 	"address": address,
+						"cust_id" : r.message
+					 };
+									
+					var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
+
+					var customer_info = $(".customer-info");
+					console.log("customer info", customer_info);
+
+					$(".customer-info").remove();
+					me.page.wrapper.find(".pos").prepend(html);
+				}
+			})	
+		}
 	};
 
 	erpnext.pos.PointOfSale = JMIPointOfSale;

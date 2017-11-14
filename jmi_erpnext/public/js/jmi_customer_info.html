@@ -17,13 +17,10 @@
 
 		<div class="col-xs-6"> 
 
-			{% 
-				if (customer_info.address.address_line1 != null) { 
+			{%
+				if (customer_info.address != null) { 
 				
-					arr_add = customer_info.address.address_line1;
-					if (customer_info.address.address_line2) {
-						arr_add = arr_add + ", " + customer_info.address.address_line2;
-					}
+					arr_add = customer_info.address
 				}else
 				{
 					arr_add = "Address not specified";
