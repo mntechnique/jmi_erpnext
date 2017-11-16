@@ -2,17 +2,14 @@
 	<div class="customer-info hidden-xs h6">
 		
 		<div class="col-xs-3">
-
 			<p style="font-size: 14px;">Customer ID:
 			 <span style="font-size: 12px; font-weight: normal;">{% if(customer_info.cust_id == null)
-			{
+			{ 
 			%}{{ "ID not defined" }}
-			{% }else{ %}
-
-			{{ customer_info.cust_id }}
-			{%}%}</span>
+			{% } else { %}
+				{{ customer_info.cust_id }}
+			{% } %}</span>
 			</p>
-
 		</div>
 
 		<div class="col-xs-6"> 

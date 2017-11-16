@@ -190,8 +190,6 @@ try {
 				callback: function(r){
 					var address = me.address[customer.customer_name];
 					me.frm.doc["address"] = address;
-
-					
 					
 					$(".po-no").blur(function () {
 						console.log("pono");
@@ -200,14 +198,13 @@ try {
 						// 	console.log(me.frm.doc.purchase_order_no)
 						// // }
 					});
+					console.log(r.message)
 
-					var custm_id = r.message;
-
-					 var customer_info = {
+					var customer_info = {
 					 	"customer": customer, 
 					 	"address": address,
-						"cust_id" : custm_id
-					 };
+						"cust_id" : r.message
+					};
 									
 					var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 
@@ -238,7 +235,7 @@ try {
 	});
 
 } catch (e){ //online POS
-	class JMIPointOfSale extends erpnext.pos.PointOfSale {
+	class PointOfSale extends erpnext.pos.PointOfSale {
 		constructor(wrapper){
 			super(wrapper);
 			console.log("extends!");
@@ -294,7 +291,10 @@ try {
 						this.frm.set_value('customer', customer),
 						console.log(this.frm.doc);
 						console.log(this.frm.doc.address_display);
-						this.fetch_and_render_customer_info(this.frm.doc);
+						console.log(this.pos_profile);
+						// if(this.pos.pos_profile.jmi_show_customer_details == 1){
+							this.fetch_and_render_customer_info(this.frm.doc);
+						// }
 					},
 					on_field_change: (item_code, field, value) => {
 						this.update_item_in_cart(item_code, field, value);
@@ -324,7 +324,7 @@ try {
 		}
 
 		fetch_and_render_customer_info(pos_doc) {
-			console.log(pos_doc)
+			console.log(pos_doc.customer)
 			var me = this;
 			frappe.call({
 				method: "jmi_erpnext.api.jmi_get_customer_information",
@@ -332,7 +332,7 @@ try {
 					"customer_name": pos_doc.customer
 				},
 				callback: function(r){
-					var address = pos_doc.address_display;
+					console.log(r);
 					// me.frm.doc["address"] = address;
 			
 					$(".po-no").blur(function () {
@@ -341,14 +341,14 @@ try {
 
 					var customer_info = {
 					 	"customer": pos_doc.customer, 
-					 	"address": address,
+					 	"address": pos_doc.address_display,
 						"cust_id" : r.message
 					 };
+					console.log("customer info", customer_info);
 									
 					var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 
 					var customer_info = $(".customer-info");
-					console.log("customer info", customer_info);
 
 					$(".customer-info").remove();
 					me.page.wrapper.find(".pos").prepend(html);
@@ -357,5 +357,5 @@ try {
 		}
 	};
 
-	erpnext.pos.PointOfSale = JMIPointOfSale;
+	erpnext.pos.PointOfSale = PointOfSale;
 }
