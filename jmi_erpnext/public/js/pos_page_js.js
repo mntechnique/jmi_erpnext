@@ -105,7 +105,6 @@ try {
 					item: function (item, input) {
 						var d = this.get_item(item.value);
 						var html = "<span>" + __(d.label || d.value) + "</span>";
-
 						if(d.customer_name) {
 							var addx = me.address[d.value];
 							html += '<br><span class="text-muted ellipsis">' + __(d.customer_name) + '</span>';
@@ -185,10 +184,23 @@ try {
 			frappe.call({
 				method: "jmi_erpnext.api.jmi_get_customer_information",
 				args:{
-					"customer_name": customer.customer_name
+					"customer_name": customer.value
 				},
 				callback: function(r){
-					var address = me.address[customer.customer_name];
+					var address_dict = me.address[customer.customer_name];
+					if(address_dict.address_line2){ var line2 = address_dict.address_line2}
+					else{line2 = ""}
+					if(address_dict.city){ var city = address_dict.city}
+					else{city = ""}						
+					if(address_dict.pincode){ var pincode = address_dict.pincode}
+					else{pincode = ""}
+					if(address_dict.state){ var state = address_dict.state}
+					else{state = ""}
+					var address = address_dict.address_line1 + "<br>" +
+						line2 + " " + city + " " + pincode + "<br>" +
+						state;
+
+					console.log("ADDRESS",address)
 					me.frm.doc["address"] = address;
 					
 					$(".po-no").blur(function () {
@@ -198,7 +210,6 @@ try {
 						// 	console.log(me.frm.doc.purchase_order_no)
 						// // }
 					});
-					console.log(r.message)
 
 					var customer_info = {
 					 	"customer": customer, 
@@ -209,7 +220,6 @@ try {
 					var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 
 					var customer_info = $(".customer-info");
-					console.log("customer info", customer_info);
 
 					$(".customer-info").remove();
 					me.page.wrapper.find(".pos").prepend(html);
@@ -238,10 +248,8 @@ try {
 	class PointOfSale extends erpnext.pos.PointOfSale {
 		constructor(wrapper){
 			super(wrapper);
-			console.log("extends!");
 		}
 		make() {
-			console.log("inside make");
 			return frappe.run_serially([
 				() => frappe.dom.freeze(),
 				() => {
@@ -264,7 +272,6 @@ try {
 		}
 
 		set_form_action() {
-			console.log("Buttons");
 			this.page.set_secondary_action(__("Print"), () => {
 				if (this.pos_profile && this.pos_profile.print_format_for_online) {
 					this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
@@ -324,7 +331,6 @@ try {
 		}
 
 		fetch_and_render_customer_info(pos_doc) {
-			console.log(pos_doc.customer)
 			var me = this;
 			frappe.call({
 				method: "jmi_erpnext.api.jmi_get_customer_information",
