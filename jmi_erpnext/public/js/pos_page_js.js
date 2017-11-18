@@ -255,7 +255,6 @@ try {
 				() => {
 					this.prepare_dom();
 					this.prepare_menu();
-					this.set_form_action();
 					this.set_online_status();
 				},
 				() => this.setup_company(),
@@ -265,6 +264,8 @@ try {
 					frappe.timeout(1);
 					this.make_items();
 					this.bind_events();
+					// 
+					this.set_form_action();
 					frappe.dom.unfreeze();
 				},
 				() => this.page.set_title(__('Online Point of Sale'))
@@ -272,11 +273,22 @@ try {
 		}
 
 		set_form_action() {
+			console.log("THIS",this)
+
 			this.page.set_secondary_action(__("Print"), () => {
-				if (this.pos_profile && this.pos_profile.print_format_for_online) {
-					this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
+				if(this.frm.doc.docstatus == 0){
+					console.log("IN IF", this.frm);
+					this.frm.save();
+					setTimeout(() => {
+						console.log("print_after_save");
+						if (this.pos_profile && this.pos_profile.print_format_for_online) {
+							this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
+							console.log(this.frm.meta.default_print_format , this.pos_profile.print_format_for_online)
+							this.frm.print_preview.printit(true);
+						}
+					}, 2000);
+					// if(this.pos_profile && this.pos_profile.print_format_for_online) {						
 				}
-				this.frm.print_preview.printit(true);
 			});
 
 			this.page.set_primary_action(__("New"), () => {
@@ -289,6 +301,8 @@ try {
 		}
 
 		make_cart() {
+			console.log("Override");
+			this.set_form_action();
 			this.cart = new POSCart({
 				frm: this.frm,
 				wrapper: this.wrapper.find('.cart-container'),
@@ -296,9 +310,9 @@ try {
 				events: {
 					on_customer_change: (customer) => {
 						this.frm.set_value('customer', customer),
-						console.log(this.frm.doc);
-						console.log(this.frm.doc.address_display);
-						console.log(this.pos_profile);
+						// console.log(this.frm.doc);
+						// console.log(this.frm.doc.address_display);
+						// console.log(this.pos_profile);
 						// if(this.pos.pos_profile.jmi_show_customer_details == 1){
 							this.fetch_and_render_customer_info(this.frm.doc);
 						// }
@@ -338,7 +352,6 @@ try {
 					"customer_name": pos_doc.customer
 				},
 				callback: function(r){
-					console.log(r);
 					// me.frm.doc["address"] = address;
 			
 					$(".po-no").blur(function () {
@@ -350,10 +363,8 @@ try {
 					 	"address": pos_doc.address_display,
 						"cust_id" : r.message
 					 };
-					console.log("customer info", customer_info);
 									
 					var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
-
 					var customer_info = $(".customer-info");
 
 					$(".customer-info").remove();
