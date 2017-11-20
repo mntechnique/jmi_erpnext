@@ -273,21 +273,16 @@ try {
 		}
 
 		set_form_action() {
-			console.log("THIS",this)
-
 			this.page.set_secondary_action(__("Print"), () => {
 				if(this.frm.doc.docstatus == 0){
-					console.log("IN IF", this.frm);
+					this.frm.doc["connection_status"] = this.connection_status;
 					this.frm.save();
 					setTimeout(() => {
-						console.log("print_after_save");
 						if (this.pos_profile && this.pos_profile.print_format_for_online) {
 							this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
-							console.log(this.frm.meta.default_print_format , this.pos_profile.print_format_for_online)
 							this.frm.print_preview.printit(true);
 						}
 					}, 2000);
-					// if(this.pos_profile && this.pos_profile.print_format_for_online) {						
 				}
 			});
 
