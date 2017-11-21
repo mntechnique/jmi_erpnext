@@ -203,13 +203,6 @@ try {
 					console.log("ADDRESS",address)
 					me.frm.doc["address"] = address;
 					
-					$(".po-no").blur(function () {
-						console.log("pono");
-						// // if(event.which == 13){
-						// 	me.frm.doc["purchase_order_no"] = $(".po_no").val();
-						// 	console.log(me.frm.doc.purchase_order_no)
-						// // }
-					});
 
 					var customer_info = {
 					 	"customer": customer, 
@@ -223,6 +216,10 @@ try {
 
 					$(".customer-info").remove();
 					me.page.wrapper.find(".pos").prepend(html);
+
+					me.page.wrapper.find(".po-no").on("input", function (event) {
+						me.frm.doc["jmi_po_no"] = me.page.wrapper.find(".po-no").val();
+					});
 				}
 			})	
 		},
@@ -275,7 +272,6 @@ try {
 		set_form_action() {
 			this.page.set_secondary_action(__("Print"), () => {
 				if(this.frm.doc.docstatus == 0){
-					this.frm.doc["connection_status"] = this.connection_status;
 					this.frm.save();
 					setTimeout(() => {
 						if (this.pos_profile && this.pos_profile.print_format_for_online) {
@@ -296,7 +292,6 @@ try {
 		}
 
 		make_cart() {
-			console.log("Override");
 			this.set_form_action();
 			this.cart = new POSCart({
 				frm: this.frm,
@@ -305,9 +300,6 @@ try {
 				events: {
 					on_customer_change: (customer) => {
 						this.frm.set_value('customer', customer),
-						// console.log(this.frm.doc);
-						// console.log(this.frm.doc.address_display);
-						// console.log(this.pos_profile);
 						// if(this.pos.pos_profile.jmi_show_customer_details == 1){
 							this.fetch_and_render_customer_info(this.frm.doc);
 						// }
@@ -347,12 +339,6 @@ try {
 					"customer_name": pos_doc.customer
 				},
 				callback: function(r){
-					// me.frm.doc["address"] = address;
-			
-					$(".po-no").blur(function () {
-						console.log("pono");
-					});
-
 					var customer_info = {
 					 	"customer": pos_doc.customer, 
 					 	"address": pos_doc.address_display,
@@ -364,6 +350,10 @@ try {
 
 					$(".customer-info").remove();
 					me.page.wrapper.find(".pos").prepend(html);
+					
+					me.page.wrapper.find(".po-no").on("input", function (event) {
+						me.frm.doc["jmi_po_no"] = me.page.wrapper.find(".po-no").val();
+					});
 				}
 			})	
 		}
