@@ -1,9 +1,7 @@
 // POS page js.
-
 try {
 	erpnext.pos.PointOfSale = erpnext.pos.PointOfSale.extend({
 		make_search: function () {
-			// this._super();
 			var me = this;
 			this.serach_item = frappe.ui.form.make_control({
 				df: {
@@ -246,35 +244,13 @@ try {
 		constructor(wrapper){
 			super(wrapper);
 		}
-		make() {
-			return frappe.run_serially([
-				() => frappe.dom.freeze(),
-				() => {
-					this.prepare_dom();
-					this.prepare_menu();
-					this.set_online_status();
-				},
-				() => this.setup_company(),
-				() => this.setup_pos_profile(),
-				() => this.make_new_invoice(),
-				() => {
-					frappe.timeout(1);
-					this.make_items();
-					this.bind_events();
-					// 
-					this.set_form_action();
-					frappe.dom.unfreeze();
-				},
-				() => this.page.set_title(__('Online Point of Sale'))
-			]);
-		}
 
 		set_form_action() {
 			this.page.set_secondary_action(__("Print"), () => {
 				if(this.frm.doc.docstatus == 0){
 					this.frm.save();
 					setTimeout(() => {
-						if (this.pos_profile && this.pos_profile.print_format_for_online) {
+						if (this.pos_profile) {
 							this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
 							this.frm.print_preview.printit(true);
 						}
@@ -282,27 +258,46 @@ try {
 				}
 			});
 
-			this.page.set_primary_action(__("New"), () => {
-				this.make_new_invoice();
-			});
+			// this.page.set_primary_action(__("New"), () => {
+			// 	this.make_new_invoice();
+			// });
 
 			this.page.add_menu_item(__("Email"), () => {
 				this.frm.email_doc();
 			});
 		}
 
+		make_new_invoice() {
+			return frappe.run_serially([
+				() => {
+					this.make_sales_invoice_frm()
+						.then(() => this.set_pos_profile_data())
+						.then(() => {
+							if (this.cart) {
+								this.cart.frm = this.frm;
+								this.cart.reset();
+							} else {
+								this.make_items();
+								this.make_cart();
+							}
+							this.toggle_editing(true);
+							this.set_form_action();
+						})
+				},
+			]);
+		}
+
 		make_cart() {
-			this.set_form_action();
 			this.cart = new POSCart({
 				frm: this.frm,
 				wrapper: this.wrapper.find('.cart-container'),
 				pos_profile: this.pos_profile,
 				events: {
 					on_customer_change: (customer) => {
-						this.frm.set_value('customer', customer),
-						// if(this.pos.pos_profile.jmi_show_customer_details == 1){
+						this.frm.set_value('customer', customer);
+						if(this.pos_profile.jmi_show_customer_details == 1){
 							this.fetch_and_render_customer_info(this.frm.doc);
-						// }
+						}
 					},
 					on_field_change: (item_code, field, value) => {
 						this.update_item_in_cart(item_code, field, value);
