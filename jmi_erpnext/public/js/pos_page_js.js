@@ -106,14 +106,14 @@ try {
 						if(d.customer_name) {
 							var addx = me.address[d.value];
 							html += '<br><span class="text-muted ellipsis">' + __(d.customer_name) + '</span>';
-							if (addx) {
-								html += '<br><div class="text-muted ellipsis">' 
-								html +=	addx.address_line1 ? __(addx.address_line1) + "<br>" : ""
-								html +=	addx.address_line2 ? __(addx.address_line2) + "<br>" : ""
-								html += addx.city ? __(addx.city) + "<br>" : "",
-								html += addx.state ? __(addx.state) : ""
-								+ '</div>';
-							}
+							// if (addx) {
+							// 	html += '<br><div class="text-muted ellipsis">' 
+							// 	html +=	addx.address_line1 ? __(addx.address_line1) + "<br>" : ""
+							// 	html +=	addx.address_line2 ? __(addx.address_line2) + "<br>" : ""
+							// 	html += addx.city ? __(addx.city) + "<br>" : "",
+							// 	html += addx.state ? __(addx.state) : ""
+							// 	+ '</div>';
+							// }
 						}
 
 						return $('<li></li>')
@@ -194,11 +194,12 @@ try {
 					else{pincode = ""}
 					if(address_dict.state){ var state = address_dict.state}
 					else{state = ""}
+					if(address_dict.country){ var state = address_dict.country}
+					else{country = ""}
 					var address = address_dict.address_line1 + "<br>" +
 						line2 + " " + city + " " + pincode + "<br>" +
-						state;
+						state + country;
 
-					console.log("ADDRESS",address)
 					me.frm.doc["address"] = address;
 					
 
@@ -223,6 +224,7 @@ try {
 		},
 
 		set_primary_action: function () {
+			// .addClass('visible-xs');
 			var me = this;
 			this.page.set_primary_action(__("New Cart"), function () {
 				me.make_new_cart()
@@ -250,17 +252,18 @@ try {
 				if(this.frm.doc.docstatus == 0){
 					this.frm.save();
 					setTimeout(() => {
-						if (this.pos_profile) {
-							this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
-							this.frm.print_preview.printit(true);
-						}
+						this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
+						this.frm.print_preview.printit(true);
 					}, 2000);
+				}
+				else{
+					this.frm.print_preview.printit(true);
 				}
 			});
 
-			// this.page.set_primary_action(__("New"), () => {
-			// 	this.make_new_invoice();
-			// });
+			this.page.set_primary_action(__("New"), () => {
+				this.make_new_invoice();
+			});
 
 			this.page.add_menu_item(__("Email"), () => {
 				this.frm.email_doc();
@@ -328,6 +331,7 @@ try {
 
 		fetch_and_render_customer_info(pos_doc) {
 			var me = this;
+			// console.log("ADD",pos_doc.address_display)
 			frappe.call({
 				method: "jmi_erpnext.api.jmi_get_customer_information",
 				args:{
