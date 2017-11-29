@@ -23,7 +23,10 @@ app_include_js = "/assets/js/jmi.min.js"
 # web_include_js = "/assets/jmi_erpnext/js/jmi_erpnext.js"
 
 # include js in page
-page_js = {"pos" : "public/js/pos_page_js.js"}
+page_js = {
+	"pos" : "public/js/pos_page_js.js",
+	"point-of-sale" : "public/js/pos_page_js.js"
+}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -141,10 +144,11 @@ fixtures = [
 			"Customer-sb_jmi_customer_id",
 			"Customer-jmi_customer_id",
 			"POS Profile-jmi_pos_settings",
-			"POS Profile-jmi_show_customer_details"]],
+			"POS Profile-jmi_show_customer_details",
+			"Sales Invoice-jmi_po_no"]],
 		]
 	},
-	{"dt": "Print Format", "filters": [["name", "in", ["JMI Point of Sale"]]]},
+	{"dt": "Print Format", "filters": [["name", "in", ["JMI Online Point of Sale","JMI Offline Point of Sale"]]]},
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"POS Profile-print_format-default",
 		"POS Profile-print_format_for_online-default"
