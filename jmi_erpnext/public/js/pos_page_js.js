@@ -263,6 +263,7 @@ try {
 
 			this.page.set_primary_action(__("New"), () => {
 				this.make_new_invoice();
+				$(".customer-info").remove();
 			});
 
 			this.page.add_menu_item(__("Email"), () => {
@@ -272,20 +273,18 @@ try {
 
 		make_new_invoice() {
 			return frappe.run_serially([
+				() => this.make_sales_invoice_frm(),
+				() => this.set_pos_profile_data(),
 				() => {
-					this.make_sales_invoice_frm()
-						.then(() => this.set_pos_profile_data())
-						.then(() => {
-							if (this.cart) {
-								this.cart.frm = this.frm;
-								this.cart.reset();
-							} else {
-								this.make_items();
-								this.make_cart();
-							}
-							this.toggle_editing(true);
-							this.set_form_action();
-						})
+					if (this.cart) {
+						this.cart.frm = this.frm;
+						this.cart.reset();
+					} else {
+						this.make_items();
+						this.make_cart();
+					}
+					this.toggle_editing(true);
+					this.set_form_action();
 				},
 			]);
 		}
@@ -298,7 +297,7 @@ try {
 				events: {
 					on_customer_change: (customer) => {
 						this.frm.set_value('customer', customer);
-						if(this.pos_profile.jmi_show_customer_details == 1){
+						if(this.frm.doc.customer&&this.pos_profile.jmi_show_customer_details == 1){
 							this.fetch_and_render_customer_info(this.frm.doc);
 						}
 					},
@@ -331,7 +330,6 @@ try {
 
 		fetch_and_render_customer_info(pos_doc) {
 			var me = this;
-			// console.log("ADD",pos_doc.address_display)
 			frappe.call({
 				method: "jmi_erpnext.api.jmi_get_customer_information",
 				args:{
@@ -339,7 +337,7 @@ try {
 				},
 				callback: function(r){
 					var customer_info = {
-					 	"customer": pos_doc.customer, 
+					 	// "customer": pos_doc.customer, 
 					 	"address": pos_doc.address_display,
 						"cust_id" : r.message
 					 };
@@ -354,7 +352,7 @@ try {
 						me.frm.doc["jmi_po_no"] = me.page.wrapper.find(".po-no").val();
 					});
 				}
-			})	
+			});
 		}
 	};
 
