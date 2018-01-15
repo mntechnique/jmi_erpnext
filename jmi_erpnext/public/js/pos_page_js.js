@@ -221,24 +221,7 @@ try {
 					});
 				}
 			})	
-		},
-
-		set_primary_action: function () {
-			// .addClass('visible-xs');
-			var me = this;
-			this.page.set_primary_action(__("New Cart"), function () {
-				me.make_new_cart()
-				me.make_menu_list()
-			}, "fa fa-plus")
-
-			this.page.set_secondary_action(__("Print"), function () {
-				var html = frappe.render(me.print_template_data, me.frm.doc)
-				me.print_document(html)
-			})
-			this.page.add_menu_item(__("Email"), function () {
-				me.email_prompt()
-			})
-		},
+		}
 	});
 
 } catch (e){ //online POS
@@ -247,113 +230,68 @@ try {
 			super(wrapper);
 		}
 
-		set_form_action() {
-			this.page.set_secondary_action(__("Print"), () => {
-				if(this.frm.doc.docstatus == 0){
-					this.frm.save();
-					setTimeout(() => {
-						this.frm.meta.default_print_format = this.pos_profile.print_format_for_online;
-						this.frm.print_preview.printit(true);
-					}, 2000);
-				}
-				else{
-					this.frm.print_preview.printit(true);
-				}
-			});
-
-			this.page.set_primary_action(__("New"), () => {
-				this.make_new_invoice();
-				$(".customer-info").remove();
-			});
-
-			this.page.add_menu_item(__("Email"), () => {
-				this.frm.email_doc();
-			});
-		}
-
-		make_new_invoice() {
-			return frappe.run_serially([
-				() => this.make_sales_invoice_frm(),
-				() => this.set_pos_profile_data(),
-				() => {
-					if (this.cart) {
-						this.cart.frm = this.frm;
-						this.cart.reset();
-					} else {
-						this.make_items();
-						this.make_cart();
-					}
-					this.toggle_editing(true);
-					this.set_form_action();
-				},
-			]);
-		}
-
 		make_cart() {
-			this.cart = new POSCart({
-				frm: this.frm,
-				wrapper: this.wrapper.find('.cart-container'),
-				pos_profile: this.pos_profile,
-				events: {
-					on_customer_change: (customer) => {
-						this.frm.set_value('customer', customer);
-						if(this.frm.doc.customer&&this.pos_profile.jmi_show_customer_details == 1){
-							this.fetch_and_render_customer_info(this.frm.doc);
-						}
-					},
-					on_field_change: (item_code, field, value) => {
-						this.update_item_in_cart(item_code, field, value);
-					},
-					on_numpad: (value) => {
-						if (value == 'Pay') {
-							if (!this.payment) {
-								this.make_payment_modal();
-							} else {
-								this.frm.doc.payments.map(p => {
-									this.payment.dialog.set_value(p.mode_of_payment, p.amount);
-								});
+		this.cart = new POSCart({
+			frm: this.frm,
+			wrapper: this.wrapper.find('.cart-container'),
+			events: {
+				on_customer_change: (customer) => {
+					this.frm.set_value('customer', customer),
 
-								this.payment.set_title();
-							}
-							this.payment.open_modal();
-						}
-					},
-					on_select_change: () => {
-						this.cart.numpad.set_inactive();
-					},
-					get_item_details: (item_code) => {
-						return this.items.get(item_code);
-					}
-				}
-			});
-		}
-
-		fetch_and_render_customer_info(pos_doc) {
-			var me = this;
-			frappe.call({
-				method: "jmi_erpnext.api.jmi_get_customer_information",
-				args:{
-					"customer_name": pos_doc.customer
 				},
-				callback: function(r){
-					var customer_info = {
-					 	// "customer": pos_doc.customer, 
-					 	"address": pos_doc.address_display,
-						"cust_id" : r.message
-					 };
-									
-					var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
-					var customer_info = $(".customer-info");
+				on_field_change: (item_code, field, value) => {
+					this.update_item_in_cart(item_code, field, value);
+				},
+				on_numpad: (value) => {
+					if (value == 'Pay') {
+						if (!this.payment) {
+							this.make_payment_modal();
+						} else {
+							this.frm.doc.payments.map(p => {
+								this.payment.dialog.set_value(p.mode_of_payment, p.amount);
+							});
 
-					$(".customer-info").remove();
-					me.page.wrapper.find(".pos").prepend(html);
-					
-					me.page.wrapper.find(".po-no").on("input", function (event) {
-						me.frm.doc["jmi_po_no"] = me.page.wrapper.find(".po-no").val();
-					});
+							this.payment.set_title();
+						}
+						this.payment.open_modal();
+					}
+				},
+				on_select_change: () => {
+					this.cart.numpad.set_inactive();
+				},
+				get_item_details: (item_code) => {
+					return this.items.get(item_code);
 				}
-			});
-		}
+			}
+		});
+	}
+
+		// fetch_and_render_customer_info(pos_doc) {
+		// 	var me = this;
+		// 	frappe.call({
+		// 		method: "jmi_erpnext.api.jmi_get_customer_information",
+		// 		args:{
+		// 			"customer_name": pos_doc.customer
+		// 		},
+		// 		callback: function(r){
+		// 			var customer_info = {
+		// 			 	// "customer": pos_doc.customer, 
+		// 			 	"address": pos_doc.address_display,
+		// 				"cust_id" : r.message
+		// 			 };
+									
+		// 			var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
+		// 			var customer_info = $(".customer-info");
+
+		// 			$(".customer-info").remove();
+		// 			me.page.wrapper.find(".pos").prepend(html);
+					
+		// 			me.page.wrapper.find(".po-no").on("input", function (event) {
+		// 				me.frm.doc["jmi_po_no"] = me.page.wrapper.find(".po-no").val();
+		// 			});
+		// 		}
+		// 	});
+		// }
 	};
 
 	erpnext.pos.PointOfSale = PointOfSale;
