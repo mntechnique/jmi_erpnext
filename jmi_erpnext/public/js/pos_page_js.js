@@ -277,16 +277,15 @@ try {
 					var customer_info = {
 						"cust_id" : r.message
 					 };
-									
+					me.page.wrapper.find("input[data-fieldname ='jmi_customer_id']") = customer_info.cust_id;
 					// var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 					// var customer_info = $(".customer-info");
 
 					// $(".customer-info").remove();
 					// me.page.wrapper.find(".pos").prepend(html);
 					
-					me.page.wrapper.find(".po-no").on("input", function (event) {
-						me.frm.doc["jmi_po_no"] = me.page.wrapper.find(".po-no").val();
-					});
+					// me.page.wrapper.find(".po-no").on("input", function (event) {
+					// });
 				}
 			});
 		}
