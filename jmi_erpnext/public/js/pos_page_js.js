@@ -277,7 +277,7 @@ try {
 					var customer_info = {
 						"cust_id" : r.message
 					 };
-					me.page.wrapper.find("input[data-fieldname ='jmi_customer_id']") = customer_info.cust_id;
+					me.wrapper.find("input[data-fieldname ='jmi_customer_id']") = customer_info.cust_id;
 					// var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 					// var customer_info = $(".customer-info");
 
