@@ -236,8 +236,10 @@ try {
 				wrapper: this.wrapper.find('.cart-container'),
 				events: {
 					on_customer_change: (customer) => {
-						this.frm.set_value('customer', customer),
-						this.fetch_and_render_customer_info(this.frm.doc)
+						this.frm.set_value('customer', customer);
+						if(this.frm.doc.customer){
+							this.fetch_and_render_customer_info(this.frm.doc);
+						}
 					},
 					on_field_change: (item_code, field, value) => {
 						this.update_item_in_cart(item_code, field, value);
