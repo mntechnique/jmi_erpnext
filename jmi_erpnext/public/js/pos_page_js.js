@@ -258,6 +258,7 @@ try {
 					},
 					on_select_change: () => {
 						this.cart.numpad.set_inactive();
+						this.set_form_action();						
 					},
 					get_item_details: (item_code) => {
 						return this.items.get(item_code);
@@ -276,7 +277,7 @@ try {
 				callback: function(r){
 					var customer_info = {
 						"cust_id" : r.message
-					 };
+					};
 					me.wrapper.find("input[data-fieldname ='jmi_customer_id']").val(customer_info.cust_id);
 					// var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 					// var customer_info = $(".customer-info");
