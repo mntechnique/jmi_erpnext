@@ -281,11 +281,11 @@ try {
 						"cust_id" : r.message
 					};
 					// me.wrapper.find("input[data-fieldname ='jmi_customer_id']").val(customer_info.cust_id);
-					if(this.additional_si_fields.length>0){
-						for(var i=0;i<this.additional_si_fields.length;i++){
+					if(me.additional_si_fields.length>0){
+						for(var i=0;i<me.additional_si_fields.length;i++){
 							// Saves value of jmi_customer_id
-							if(this.additional_si_fields[i].df.fieldname == "jmi_customer_id"){
-								this.frm.set_value(this.additional_si_fields[i].value,customer_info.cust_id);
+							if(me.additional_si_fields[i].df.fieldname == "jmi_customer_id"){
+								me.frm.set_value(me.additional_si_fields[i].value,customer_info.cust_id);
 							}
 						}
 					}
