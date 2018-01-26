@@ -237,7 +237,7 @@ try {
 				events: {
 					on_customer_change: (customer) => {
 						this.frm.set_value('customer', customer);
-						if(this.frm.doc.customer){
+						if(this.frm.doc.customer&&this.frm.doc.show_additional_customer_details){
 							this.fetch_and_render_customer_info(this.frm.doc);
 						}
 					},
@@ -280,8 +280,16 @@ try {
 					var customer_info = {
 						"cust_id" : r.message
 					};
-					me.wrapper.find("input[data-fieldname ='jmi_customer_id']").val(customer_info.cust_id);
-					me.frm.doc.jmi_customer_id = customer_info.cust_id;
+					// me.wrapper.find("input[data-fieldname ='jmi_customer_id']").val(customer_info.cust_id);
+					if(this.additional_si_fields.length>0){
+						for(var i=0;i<this.additional_si_fields.length;i++){
+							// Saves value of jmi_customer_id
+							if(this.additional_si_fields[i].df.fieldname == "jmi_customer_id"){
+								this.frm.set_value(this.additional_si_fields[i].value,customer_info.cust_id);
+							}
+						}
+					}
+					
 					// var html = frappe.render_template("jmi_customer_info", {"customer_info": customer_info})
 					// var customer_info = $(".customer-info");
 
