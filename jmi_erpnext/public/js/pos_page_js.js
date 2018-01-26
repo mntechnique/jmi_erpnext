@@ -285,7 +285,7 @@ try {
 						for(var i=0;i<me.additional_si_fields.length;i++){
 							// Saves value of jmi_customer_id
 							if(me.additional_si_fields[i].df.fieldname == "jmi_customer_id"){
-								me.frm.set_value(me.additional_si_fields[i].value,customer_info.cust_id);
+								me.additional_si_fields[i].value = customer_info.cust_id;
 							}
 						}
 					}
