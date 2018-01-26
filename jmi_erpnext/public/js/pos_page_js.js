@@ -280,7 +280,8 @@ try {
 					var customer_info = {
 						"cust_id" : r.message
 					};
-					// me.wrapper.find("input[data-fieldname ='jmi_customer_id']").val(customer_info.cust_id);
+					me.wrapper.find("input[data-fieldname ='jmi_customer_id']").val(customer_info.cust_id);
+					me.frm.set_value("jmi_customer_id",customer_info.cust_id);
 					if(me.additional_si_fields.length>0){
 						for(var i=0;i<me.additional_si_fields.length;i++){
 							// Saves value of jmi_customer_id
