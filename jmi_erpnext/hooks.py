@@ -149,7 +149,7 @@ fixtures = [
 			"Sales Invoice-jmi_customer_id"]],
 		]
 	},
-	{"dt": "Print Format", "filters": [["name", "in", ["JMI Online Point of Sale","JMI Offline Point of Sale"]]]},
+	{"dt": "Print Format", "filters": [["name", "in", ["JMI Online Point of Sale","JMI Offline Point of Sale","MS Mobile POS"]]]},
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"POS Profile-print_format-default",
 		"POS Profile-print_format_for_online-default"

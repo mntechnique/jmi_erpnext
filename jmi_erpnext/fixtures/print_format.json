@@ -38,5 +38,25 @@
   "print_format_type": "Js", 
   "show_section_headings": 0, 
   "standard": "Yes"
+ }, 
+ {
+  "align_labels_right": 0, 
+  "css": null, 
+  "custom_format": 1, 
+  "disabled": 0, 
+  "doc_type": "Sales Invoice", 
+  "docstatus": 0, 
+  "doctype": "Print Format", 
+  "font": "Default", 
+  "format_data": null, 
+  "html": "<div class=\"page-break\">\n\t<div class=\"col-xs-12\">\n\t\t<p class=\"pull-right\"><b>Invoice No. :</b> &nbsp; {{ doc.name }}</p>\n\t</div>\n\t \t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12 text-center\">\n\t\t\t\n\t\t\t{% if doc.docstatus == 0 %}\n\t\t\t\t{{ doc.status }}\n\t\t\t{% endif %}   \t\t \n\t\t\t</div>\n\t\t</div>\n\t<div class=\"row\">\n\t\t<div class=\"col-xs-12\">\n\t\t{%- if letter_head -%}\n\t\t\t{{ letter_head }}\n\t\t{%- endif -%}\n\t\t</div>\n\t</div>\n\n\t<hr/>\n\n\n\t<div class=\"row\">\n\t<div class=\"col-xs-6\">\n\t\t\n\t\t<div class=\"col-xs-3\">\n\t\t\t<b style=\"font-size:14px;\">Bill to:</b>\n\t\t</div>\n\t\t\n\t\t<div class=\"col-xs-9 pull-left\">\n\t\t\t<p><b>{{ doc.customer }}</b></p>\n\t\t\t<p> {{ doc.address_display }}</p>\n\t\t</div>\n\t</div>\n\n\t<div class=\"col-xs-6\">\n\t\t<div class=\"col-xs-3\">\n\t\t\t<b style=\"font-size:14px;\">Ship to:</b>\n\t\t</div>\n\t\t\n\t\t<div class=\"col-xs-9 pull-left\" >\n\t\t\t<p><b>{{ doc.customer }}</b></p>\n\t\t\t<p> {{ doc.shipping_address }}</p>\n\t\t</div>\n\t</div>\n</div>\n\n<hr>\n\n<div class=\"row\">\n\t<div class=\"col-xs-4\" >\n\t\t<p><b style=\"font-size:14px;\">Customer ID:</b>\n\t\t<!-- <p><b>{{ doc.jmi_customer_id }}</b></p> -->\n\t</div>\n\t<div class=\"col-xs-4\">\n\t\t<p><b style=\"font-size:14px;\">Sales Rep:</b>\n\t\t{{ frappe.session.user }}</b></p>\n\t</div>\n\t<div class=\"col-xs-4\">\n\t\t<p><b style=\"font-size:14px;\">PO #:</b>\n\t\t<!-- <p><b> {{ doc.po_no }}</b></p> -->\n\t</div>\n</div>\n\n\n\n\t<table class=\"table table-condensed table-bordered\"> \n\t<thead>\n\t\t<tr>\n\t\t<th class=\"col-xs-1\">S.No</th>\n\t\t<th class=\"col-xs-2\">ITEM CODE </th>\n\t\t<th class=\"col-xs-4\">DESCRIPTION</th>\n\t\t<th class=\"col-xs-2\">Qty</th>\n\t\t<th class=\"col-xs-1\">Price (&#8377;)  </th>\n\t\t<th class=\"col-xs-2\" style=\"text-align:right;\">Total</th>\n\t\t</tr>\n\t</thead>\n\n\t<tbody>\n\t\t{% for row in doc.items %}\n\t\t\t<tr>\n\t\t\t\t<td class=\"col-xs-1\">{{ row.idx }}</td>\n\t\t\t\t<td class=\"col-xs-2\">{{ row.item_code }}</td>\n\t\t\t\t<td class=\"col-xs-4\">{{ row.description }}</td>\n\t\t\t\t\n\t\t\t\t\n\t\t\t\t<td class=\"col-xs-2\">\n\t\t\t\t\t<span class=\"pull-left\">{{ frappe.format_value((row.qty), {\"fieldtype\":\"Float\"}) }}</span><br>\n\t\t\t\t\t<span class=\"pull-right\">{{ row.uom }}</span>\n\t\t\t\t</td>\n\n\t\t\t\t\n\n\t\t\t\t<td class=\"col-xs-1\" style=\"text-align:right\">{{ '%0.2f' % row.price_list_rate }}</td>\n\t\t\t\t\n\t\t\t\t<td class=\"col-xs-2\" style=\"text-align:right\">\n\t\t\t\t\t&#8377; {{ frappe.format_value((row.price_list_rate*row.qty), {\"fieldtype\":\"Currency\"}) }}\n\t\t\t\t</td>\t\t\t\t\t\t\t\t\n\t\t\t\t</tr>\n\t\t{% endfor %}\n\n\t\t<tr>\n\t\t\t<!-- colspan=\"9\" -->\n\t\t\t<td colspan=\"5\" style=\"text-align:right;\">\n\t\t\t\t<p>Net Total:</p>\n\t\t\t\t{% for tax in doc.taxes %}\n\t\t\t\t{% if (tax.charge_type!=\"Actual\") %}\n\t\t\t\t<p>{{ tax.description }}:</p>\n\t\t\t\t{% endif %}\n\t\t\t\t{% endfor %}\n\t\t\t\t<p>Total Due:</p>\n\t\t\t</td>\n\t\t\t<td colspan=\"1\">\n\t\t\t\t<p style=\"text-align:right\">&#8377; {{ frappe.format_value((doc.total), {\"fieldtype\":\"Currency\"}) }}</p>\n\t\t\t\t\n\t\t\t\t{% for tax in doc.taxes %}\n\t\t\t\t{% if (tax.charge_type!=\"Actual\") %}\n\t\t\t\t<p style=\"text-align:right\">&#8377; {{ frappe.format_value((tax.tax_amount), {\"fieldtype\":\"Currency\"}) }}</p>\n\t\t\t\t{% endif %}\n\t\t\t\t{% endfor %}\n\t\t\t\t<p style=\"text-align:right\">&#8377; {{ frappe.format_value((doc.grand_total),{\"fieldtype\":\"Currency\"}) }}</p>\n\n\t\t\t</td>\n\t\t</tr>\n\t</tbody>\n\t</table>        \n\n<!--   -->\n\t<div id=\"footer-html\" class=\"visible-pdf\">\n\t  {% if not no_letterhead and footer %}\n\t  <div class=\"letter-head-footer\">\n\t    {{ footer }}\n\t  </div>\n\t  {% endif %}\n\t</div>\n</div>\n\n", 
+  "line_breaks": 0, 
+  "modified": "2018-02-02 19:20:57.278527", 
+  "module": "JMI ERPNext", 
+  "name": "MS Mobile POS", 
+  "print_format_builder": 0, 
+  "print_format_type": "Server", 
+  "show_section_headings": 0, 
+  "standard": "No"
  }
 ]
