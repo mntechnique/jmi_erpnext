@@ -1,13 +1,13 @@
 [
  {
-  "content": "<div><img src=\"/files/logo.png\" style=\"width: 519px;\"><br></div>", 
+  "content": "<div><br></div>", 
   "disabled": 0, 
   "docstatus": 0, 
   "doctype": "Letter Head", 
-  "footer": "<div><img src=\"/files/footer.png\" style=\"width: 861px; float: left;\"><br></div>", 
+  "footer": "<div><br></div>", 
   "is_default": 0, 
   "letter_head_name": "Majestic Solutions", 
-  "modified": "2018-02-09 15:27:30.984228", 
+  "modified": "2018-02-10 04:13:08.202702", 
   "name": "Majestic Solutions"
  }
 ]
