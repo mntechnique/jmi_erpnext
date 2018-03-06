@@ -123,7 +123,7 @@ def get_gl_entries(filters):
 			against_voucher_type, against_voucher, account_currency,
 			remarks, against, is_opening {select_fields}
 		from `tabGL Entry`
-		where voucher_type = "Sales Invoice" and company=%(company)s {conditions}
+		where against_voucher_type = "Sales Invoice"  and company=%(company)s {conditions}
 		{group_by_condition}
 		order by posting_date, account
 		""".format(
@@ -147,7 +147,7 @@ def get_against_account(filters):
 		select distinct
 		against
 		from `tabGL Entry`
-		where against_voucher_type = "Sales Invoice" and company=%(company)s {conditions}
+		where voucher_type = "Payment Entry" and against_voucher_type = "Sales Invoice" and company=%(company)s {conditions}
 		""".format(
 			select_fields=select_fields, conditions=get_conditions(filters)
 		),
@@ -351,6 +351,12 @@ def get_columns(against_accounts,filters):
 			"fieldtype": "Link",
 			"options": "Account",
 			"width": 180
+		},
+		{
+			"label": _("Debit ({0})".format(currency)),
+			"fieldname": "debit",
+			"fieldtype": "Float",
+			"width": 100
 		},
 		{
 			"label": _("Credit ({0})".format(currency)),

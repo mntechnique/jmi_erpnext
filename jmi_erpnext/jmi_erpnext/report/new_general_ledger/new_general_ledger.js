@@ -107,12 +107,12 @@ frappe.query_reports["New General Ledger"] = {
 			"label": __("Group by Account"),
 			"fieldtype": "Check",
 		},
-		{
-			"fieldname": "presentation_currency",
-			"label": __("Currency"),
-			"fieldtype": "Select",
-			"options": erpnext.get_presentation_currency_list()
-		}
+		// {
+		// 	"fieldname": "presentation_currency",
+		// 	"label": __("Currency"),
+		// 	"fieldtype": "Select",
+		// 	"options": "a"
+		// }
 	]
 }
 
