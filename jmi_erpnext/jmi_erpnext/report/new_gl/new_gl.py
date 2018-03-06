@@ -96,7 +96,6 @@ def set_account_currency(filters):
 def get_result(filters, account_details, against_accounts):
 	gl_entries = get_gl_entries(filters)
 
-	# against_column = get_gl_entries(filters)
 
 	data = get_data_with_opening_closing(filters, account_details, gl_entries)
 
@@ -133,14 +132,6 @@ def get_gl_entries(filters):
 		),
 		filters, as_dict=1)
 
-	# """select against_voucher_type from `tabGL Entry` where voucher_type != "Sales Invoice" and against_voucher_type="Sales Invoice" and company=%(company)s {conditions}
-	# 	{group_by_condition}
-	# 	order by posting_date, account
-	# 	""".format(
-	# 		select_fields=select_fields, conditions=get_conditions(filters),
-	# 		group_by_condition=group_by_condition
-	# 	),
-	# 	filters, as_dict=1)
 
 	if filters.get('presentation_currency'):
 		return convert_to_presentation_currency(gl_entries, currency_map)

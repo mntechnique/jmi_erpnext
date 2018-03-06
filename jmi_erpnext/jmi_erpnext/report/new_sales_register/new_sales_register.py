@@ -49,18 +49,6 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			for col in additional_query_columns:
 				row.append(inv.get(col))
 
-		# row +=[
-			# customer_details.get("customer_group"),
-			# customer_details.get("territory"),
-			# inv.debit_to, ", ".join(mode_of_payments.get(inv.name, [])),
-			# inv.project,
-			 # inv.owner,
-			  # inv.remarks,
-			# ", ".join(sales_order), ", ".join(delivery_note),
-			# ", ".join(cost_center),
-			# ", ".join(warehouse), 
-			# company_currency
-		# ]
 		# map income values
 		base_net_total = 0
 		for income_acc in income_accounts:
@@ -92,34 +80,13 @@ def get_columns(invoice_list, additional_table_columns):
 	"""return columns based on filters"""
 	columns = [
 		_("Invoice") + ":Link/Sales Invoice:120",
-		#  _("Posting Date") + ":Date:80",
-		# _("Customer") + ":Link/Customer:120",
 		 _("Customer Name") + "::120"
 	]
 
 	if additional_table_columns:
 		columns += additional_table_columns
 
-	# columns +=[
-		# _("Customer Group") + ":Link/Customer Group:120",
-		 # _("Territory") + ":Link/Territory:80",
-		# _("Receivable Account") + ":Link/Account:120", 
-		# _("Mode of Payment") + "::120",
-		# _("Project") +":Link/Project:80",  
-		# _("Owner") + "::150", 
-		# _("Remarks") + "::150",
-		# _("Sales Order") + ":Link/Sales Order:100", 
-			# _("Delivery Note") + ":Link/Delivery Note:100",
-		# _("Cost Center") + ":Link/Cost Center:100", 
-		# _("Warehouse") + ":Link/Warehouse:100",
-		# {
-		# 	"fieldname": "currency",
-		# 	"label": _("Currency"),
-		# 	"fieldtype": "Data",
-		# 	"width": 80
-		# }
-	# ]
-
+	
 	income_accounts = tax_accounts = income_columns = tax_columns = []
 
 	if invoice_list:

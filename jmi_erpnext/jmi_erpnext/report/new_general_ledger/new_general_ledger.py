@@ -26,9 +26,11 @@ def execute(filters=None):
 
 	filters = set_account_currency(filters)
 
-	columns = get_columns(filters)
+	against_accounts = get_against_account(filters)
 
-	res = get_result(filters, account_details)
+	columns = get_columns(against_accounts,filters)
+
+	res = get_result(filters,account_details,against_accounts)
 
 	return columns, res
 
@@ -91,8 +93,9 @@ def set_account_currency(filters):
 
 		return filters
 
-def get_result(filters, account_details):
+def get_result(filters, account_details, against_accounts):
 	gl_entries = get_gl_entries(filters)
+
 
 	data = get_data_with_opening_closing(filters, account_details, gl_entries)
 
@@ -107,8 +110,9 @@ def get_gl_entries(filters):
 		sum(credit_in_account_currency) as credit_in_account_currency""" \
 
 
-	group_by_condition = "group by voucher_type, voucher_no, account, cost_center" \
+	group_by_condition = "group by voucher_type, voucher_no,  account, cost_center" \
 		if filters.get("group_by_voucher") else "group by name"
+
 
 	gl_entries = frappe.db.sql(
 		"""
@@ -119,7 +123,7 @@ def get_gl_entries(filters):
 			against_voucher_type, against_voucher, account_currency,
 			remarks, against, is_opening {select_fields}
 		from `tabGL Entry`
-		where company=%(company)s {conditions}
+		where voucher_type = "Sales Invoice" and company=%(company)s {conditions}
 		{group_by_condition}
 		order by posting_date, account
 		""".format(
@@ -128,10 +132,30 @@ def get_gl_entries(filters):
 		),
 		filters, as_dict=1)
 
+
 	if filters.get('presentation_currency'):
 		return convert_to_presentation_currency(gl_entries, currency_map)
 	else:
 		return gl_entries
+
+def get_against_account(filters):
+	select_fields = """, sum(debit_in_account_currency) as debit_in_account_currency,
+		sum(credit_in_account_currency) as credit_in_account_currency""" \
+
+	against_accounts = frappe.db.sql(
+		"""
+		select distinct
+		against
+		from `tabGL Entry`
+		where against_voucher_type = "Sales Invoice" and company=%(company)s {conditions}
+		""".format(
+			select_fields=select_fields, conditions=get_conditions(filters)
+		),
+		filters, as_list=1)
+	
+	for x in xrange(1,10):
+		print "a",against_accounts
+	return against_accounts		
 
 
 def get_conditions(filters):
@@ -298,7 +322,7 @@ def get_balance(row, balance, debit_field, credit_field):
 
 	return balance
 
-def get_columns(filters):
+def get_columns(against_accounts,filters):
 	if filters.get("presentation_currency"):
 		currency = filters["presentation_currency"]
 	else:
@@ -310,10 +334,16 @@ def get_columns(filters):
 
 	columns = [
 		{
-			"label": _("Posting Date"),
-			"fieldname": "posting_date",
-			"fieldtype": "Date",
-			"width": 90
+			"label": _("Against Voucher"),
+			"fieldname": "against_voucher",
+			"fieldtype": "Dynamic Link",
+			"options": "against_voucher_type",
+			"width": 100
+		},
+		{
+			"label": _("Against Voucher Type"),
+			"fieldname": "against_voucher_type",
+			"width": 180
 		},
 		{
 			"label": _("Account"),
@@ -323,30 +353,10 @@ def get_columns(filters):
 			"width": 180
 		},
 		{
-			"label": _("Debit ({0})".format(currency)),
-			"fieldname": "debit",
-			"fieldtype": "Float",
-			"width": 100
-		},
-		{
 			"label": _("Credit ({0})".format(currency)),
 			"fieldname": "credit",
 			"fieldtype": "Float",
 			"width": 100
-		},
-		{
-			"label": _("Balance ({0})".format(currency)),
-			"fieldname": "balance",
-			"fieldtype": "Float",
-			"width": 130
-		}
-	]
-
-	columns.extend([
-		{
-			"label": _("Voucher Type"),
-			"fieldname": "voucher_type",
-			"width": 120
 		},
 		{
 			"label": _("Voucher No"),
@@ -354,57 +364,17 @@ def get_columns(filters):
 			"fieldtype": "Dynamic Link",
 			"options": "voucher_type",
 			"width": 180
-		},
-		{
-			"label": _("Against Account"),
-			"fieldname": "against",
-			"width": 120
-		},
-		{
-			"label": _("Party Type"),
-			"fieldname": "party_type",
-			"width": 100
-		},
-		{
-			"label": _("Party"),
-			"fieldname": "party",
-			"width": 100
-		},
-		{
-			"label": _("Project"),
-			"options": "Project",
-			"fieldname": "project",
-			"width": 100
-		},
-		{
-			"label": _("Cost Center"),
-			"options": "Cost Center",
-			"fieldname": "cost_center",
-			"width": 100
-		},
-		{
-			"label": _("Against Voucher Type"),
-			"fieldname": "against_voucher_type",
-			"width": 100
-		},
-		{
-			"label": _("Against Voucher"),
-			"fieldname": "against_voucher",
-			"fieldtype": "Dynamic Link",
-			"options": "against_voucher_type",
-			"width": 100
-		},
-		{
-			"label": _("Supplier Invoice No"),
-			"fieldname": "bill_no",
-			"fieldtype": "Data",
-			"width": 100
-		},
-		{
-			"label": _("Remarks"),
-			"fieldname": "remarks",
-			"width": 400
 		}
-	])
+	]
+
+	for a in against_accounts:
+		columns.extend([
+			{
+			"label": a[0],
+			"fieldname": a[0],
+			"fieldtype": "Float",
+			"width": 180
+			}
+		])
 
 	return columns
