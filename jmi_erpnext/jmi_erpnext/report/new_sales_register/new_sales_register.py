@@ -3,17 +3,23 @@
 
 from __future__ import unicode_literals
 import frappe
-from frappe.utils import flt
+from erpnext import get_company_currency, get_default_company
+from erpnext.accounts.report.utils import get_currency, convert_to_presentation_currency
+from frappe.utils import getdate, cstr, flt, fmt_money
+from erpnext.accounts.utils import get_account_currency
 from frappe import msgprint, _
 
 def execute(filters=None):
 	return _execute(filters)
 
+
 def _execute(filters, additional_table_columns=None, additional_query_columns=None):
+	
 	if not filters: filters = frappe._dict({})
 
 	invoice_list = get_invoices(filters, additional_query_columns)
-	columns, income_accounts, tax_accounts = get_columns(invoice_list, additional_table_columns)
+
+	columns, income_accounts, tax_accounts = get_columns(invoice_list, additional_table_columns, filters)
 
 	if not invoice_list:
 		msgprint(_("No record found"))
@@ -41,8 +47,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		customer_details = customer_map.get(inv.customer, {})
 		row = [
 			inv.name,
-			 # inv.posting_date, inv.customer,
-			  inv.customer_name
+			inv.customer_name
 		]
 
 		if additional_query_columns:
@@ -67,17 +72,64 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				total_tax += tax_amount
 				row.append(tax_amount)
 
-		# total tax, grand total, outstanding amount & rounded total
-		row += [total_tax, inv.base_grand_total, 
-		# inv.base_rounded_total,
-		 inv.outstanding_amount]
+		gl_list = get_gl_entries(filters,inv.name)
+		for x in xrange(1,10):
+			print "gl",gl_list
+			print "col",columns
+		
+			# for a in columns:
+			# 	acc = a.split(":")
+			# 	print "split",acc[0]
+			
+		for entry in gl_list:
+		# 		if entry.against == acc[0]:
+			# t = [a.split(":") for a in columns if entry.against == acc[0]]
+			# print "t",t
+			
+			print "EC",entry.get("credit"),entry.credit				
+			v = entry.credit
+			# total tax, grand total, outstanding amount & rounded total
+			# print "R",row
+			row += [total_tax, inv.base_grand_total, inv.outstanding_amount,v,10,10,10,10]
+
 
 		data.append(row)
 
 	return columns, data
 
-def get_columns(invoice_list, additional_table_columns):
+def set_account_currency(filters):
+	if not (filters.get("account") or filters.get("party")):
+		return filters
+	else:
+		filters["company_currency"] = frappe.db.get_value("Company", filters.company, "default_currency")
+		account_currency = None
+
+		if filters.get("account"):
+			account_currency = get_account_currency(filters.account)
+		elif filters.get("party"):
+			gle_currency = frappe.db.get_value(
+				"GL Entry", {
+					"party_type": filters.party_type, "party": filters.party, "company": filters.company
+				},
+				"account_currency"
+			)
+
+			if gle_currency:
+				account_currency = gle_currency
+			else:
+				account_currency = None if filters.party_type == "Employee" else \
+					frappe.db.get_value(filters.party_type, filters.party, "default_currency")
+
+		filters["account_currency"] = account_currency or filters.company_currency
+
+		if filters.account_currency != filters.company_currency:
+			filters["show_in_account_currency"] = 1
+
+	return filters
+
+def get_columns(invoice_list, additional_table_columns, filters):
 	"""return columns based on filters"""
+	#column1
 	columns = [
 		_("Invoice") + ":Link/Sales Invoice:120",
 		 _("Customer Name") + "::120"
@@ -86,8 +138,7 @@ def get_columns(invoice_list, additional_table_columns):
 	if additional_table_columns:
 		columns += additional_table_columns
 
-	
-	income_accounts = tax_accounts = income_columns = tax_columns = []
+	income_accounts = tax_accounts = income_columns = tax_columns = against_accounts_columns = []
 
 	if invoice_list:
 		income_accounts = frappe.db.sql_list("""select distinct income_account
@@ -101,17 +152,47 @@ def get_columns(invoice_list, additional_table_columns):
 			and parent in (%s) order by account_head""" %
 			', '.join(['%s']*len(invoice_list)), tuple([inv.name for inv in invoice_list]))
 
-	income_columns = [(account + ":Currency/currency:120") for account in income_accounts]
+	income_columns = [("Net Total" + ":Currency/currency:120")]
 	for account in tax_accounts:
 		if account not in income_accounts:
 			tax_columns.append(account + ":Currency/currency:120")
 
+	#column2
 	columns = columns + income_columns + [_("Net Total") + ":Currency/currency:120"] + tax_columns + \
 		[_("Total Tax") + ":Currency/currency:120", _("Grand Total") + ":Currency/currency:120",
-		# _("Rounded Total") + ":Currency/currency:120", 
 		_("Outstanding Amount") + ":Currency/currency:120"]
 
+
+	# select_fields = """, sum(debit_in_account_currency) as debit_in_account_currency,
+	# 	sum(credit_in_account_currency) as credit_in_account_currency""" \
+
+	against_accounts = frappe.db.sql_list(
+		"""
+		select distinct
+		against
+		from `tabGL Entry`
+		where voucher_type IN ('Payment Entry' , 'Sales Invoice' , 'Journal Voucher') and against_voucher_type = "Sales Invoice"
+		""".format(
+			 conditions=get_conditions(filters)
+		),
+		filters)
+	
+	#column3
+	for a in against_accounts:
+		against_accounts_columns = _(a) + ":Currency/currency:120"
+		# [{
+		# 	"label": a,
+		# 	"fieldname": a,
+		# 	"fieldtype": "Currency",
+		# 	"width": 100
+		#   	}]
+		columns.append(against_accounts_columns)  	
+
+	for x in xrange(1,10):
+		print "a",columns
+
 	return columns, income_accounts, tax_accounts
+
 
 def get_conditions(filters):
 	conditions = ""
@@ -233,7 +314,6 @@ def get_customer_details(customers):
 
 	return customer_map
 
-
 def get_mode_of_payments(invoice_list):
 	mode_of_payments = {}
 	if invoice_list:
@@ -245,3 +325,22 @@ def get_mode_of_payments(invoice_list):
 			mode_of_payments.setdefault(d.parent, []).append(d.mode_of_payment)
 
 	return mode_of_payments
+
+def get_gl_entries(filters,inv_name):
+
+	gl_entries = frappe.db.sql(
+		"""
+		select
+			account,
+			credit,
+			voucher_type,
+			against_voucher_type, against_voucher, against
+		from `tabGL Entry`
+		where against_voucher_type = "Sales Invoice" and voucher_type IN ('Payment Entry' , 'Sales Invoice' , 'Journal Voucher')
+		order by posting_date desc, name desc
+		""".format(
+			inv_name = inv_name
+		),
+		filters, as_dict=1)
+	# or against_voucher = {inv_name}
+	return gl_entries
