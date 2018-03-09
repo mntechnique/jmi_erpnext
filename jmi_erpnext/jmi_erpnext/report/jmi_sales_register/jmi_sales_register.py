@@ -73,14 +73,10 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				row.append(tax_amount)
 
 		gl_list = get_gl_entries(filters,inv.name)
-		for x in xrange(1,10):
-			print "gl",gl_list
 			
 		row += [total_tax, inv.base_grand_total, inv.outstanding_amount]
-		print "aa", against_accounts
 		for col in against_accounts:
 			
-			print "col",col
 			credit = [gl_entry.credit for gl_entry in gl_list if gl_entry.against == col]
 		
 			row.append(credit[0] if len(credit) > 0 else 0.0)
@@ -167,9 +163,6 @@ def get_columns(invoice_list, additional_table_columns, filters):
 	for a in against_accounts:
 		against_accounts_columns = _(a) + ":Currency/currency:120"
 		columns.append(against_accounts_columns)  	
-
-	for x in xrange(1,10):
-		print "a",columns
 
 	return columns, income_accounts, tax_accounts , against_accounts
 
