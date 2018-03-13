@@ -56,5 +56,3 @@ frappe.query_reports["JMI Sales Register"] = {
 		}
 	]
 }
-
-
