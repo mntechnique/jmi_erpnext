@@ -39,25 +39,42 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		row.append(inv.name)
 		row.append(inv.customer_name)
 
-
+		# total_total = 0
 		total = [im.get("total") for im in invoice_income_map if im.name == inv.name]
-		row.append(total)
+		# total_total += total
+		# for x in xrange(1,10):
+		# 	print "tt",total_total
+ 		row.append(total)
 
+		
+ 		# total_taxes = 0
 		total_taxes_and_charges = [im.get("total_taxes_and_charges") for im in invoice_income_map if im.name == inv.name]
+		# total_taxes += sum(total_taxes_and_charges)
+		# for x in xrange(1,10):
+		# 	print "tt",total_taxes
 		row.append(total_taxes_and_charges)
 
+		# total_gt = inv.grand_total
 		grand_total = [im.get("grand_total") for im in invoice_income_map if im.name == inv.name]
+		# total_gt = sum(grand_total)
+		# for x in xrange(1,10):
+		# 	print "tg",total_gt
 		row.append(grand_total)
 
+
 		amt_list = get_amount_entries(inv.name)
-		for x in xrange(1,10):
-			print "amt" , amt_list
 		for col in mop:
-		
 			credit = [a_entry.amount for a_entry in amt_list if a_entry.mode_of_payment == col]
 			row.append(credit[0] if len(credit) > 0 else 0.0)
 			
+
+		change_amount = [im.get("change_amount") for im in invoice_income_map if im.name == inv.name]
+		row.append(change_amount)
+
+		# row += [total_total]
+
 		data.append(row)
+
 
 
 	return columns, data
@@ -89,6 +106,8 @@ def get_columns(invoice_list, additional_table_columns,filters):
 	for a in mop:
 		mop_columns = _(a) + ":Currency/currency:120"
 		columns.append(mop_columns)  
+
+	columns.append(_("Change Amount") + ":Currency/Currency:120")
 
 	return columns, mop
 
@@ -125,15 +144,17 @@ def get_invoices(filters, additional_query_columns):
 		additional_query_columns = ', ' + ', '.join(additional_query_columns)
 
 	conditions = get_conditions(filters)
-	return frappe.db.sql("""select name, posting_date, debit_to, project, customer, customer_name, owner, remarks,
+	return frappe.db.sql("""select name, posting_date, customer, customer_name, owner,
 		base_net_total, base_grand_total, base_rounded_total, outstanding_amount {0}
 		from `tabSales Invoice`
 		where docstatus = 1 and is_pos= 1 %s order by posting_date desc, name desc""".format(additional_query_columns or '') %
 		conditions, filters, as_dict=1)
 
 def get_invoice_income_map(invoice_list):
-	income_details = frappe.db.sql("""select name, total, grand_total from `tabSales Invoice` where docstatus = 1 and is_pos= 1 group by name desc""", as_dict=1)
-		
+	income_details = frappe.db.sql("""select name, total, sum(total) as nettotal, grand_total , sum(grand_total) as netgrand, change_amount, sum(change_amount) as netchange from `tabSales Invoice` where docstatus = 1 and is_pos= 1 group by name desc""", as_dict=1)
+	for x in xrange(1,10):
+		print "icn" , income_details
+
 	return income_details
 
 
@@ -205,8 +226,6 @@ def get_mode_of_payments(invoice_list):
 	return mode_of_payments
 
 def get_amount_entries(inv_name):
-	for x in xrange(1,10):
-		print "inv" , inv_name
 	amt_entries = frappe.db.sql(
 		"""select parent, mode_of_payment, amount
 			from `tabSales Invoice Payment`
