@@ -143,13 +143,14 @@ fixtures = [
 			["name", "in", [
 			"Customer-sb_jmi_customer_id",
 			"Customer-jmi_customer_id",
-			"Sales Invoice-sb_customer_details",
-			"Sales Invoice-jmi_po_no",
-			"Sales Invoice-cb",
-			"Sales Invoice-jmi_customer_id"]],
+			"Sales Invoice-section_break_167",
+			"Sales Invoice-jmi_customer_id",
+			"Sales Invoice-column_break_169",
+			"Sales Invoice-jmi_po_no"
+			]],
 		]
 	},
-	{"dt": "Print Format", "filters": [["name", "in", ["Stationary - POS Invoice","JMI Offline Point of Sale","Mobile - POS Invoice","JMI Online Point of Sale","POS Invoice"]]]},
+	{"dt": "Print Format", "filters": [["name", "in", ["Stationary - POS Invoice","Mobile - POS Invoice"]]]},
 	{"dt": "Letter Head", "filters": [["name", "in", ["Majestic Solutions"]]]},
 	{"dt": "Property Setter", "filters": [["name", "in", [
 		"POS Profile-print_format-default",
