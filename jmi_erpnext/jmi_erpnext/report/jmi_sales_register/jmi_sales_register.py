@@ -236,3 +236,9 @@ def get_amount_entries(inv_name):
 		),
 		as_dict=1)
 	return amt_entries
+
+def get_total(invoice_list):
+	nettotal = frappe.db.sql("""select name, sum(total) as nettotal, sum(grand_total) as netgrand,
+		sum(change_amount) as netchange from `tabSales Invoice` where docstatus = 1 and is_pos= 1 group by name desc""", as_dict=1)
+
+	return nettotal
