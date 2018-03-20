@@ -140,8 +140,7 @@ def get_invoice_income_map(invoice_list):
 
 def get_invoice_tax_map(invoice_list):
 	tax_details = frappe.db.sql("""select name, total_taxes_and_charges from `tabSales Invoice`where docstatus = 1 and is_pos= 1 group by name desc""", as_dict=1)
-	# for x in xrange(1,10):
-	# 	print "tax_details", tax_details
+
 	return tax_details
 
 def get_invoice_so_dn_map(invoice_list):
