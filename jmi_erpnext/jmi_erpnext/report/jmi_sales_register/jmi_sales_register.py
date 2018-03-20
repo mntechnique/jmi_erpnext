@@ -39,12 +39,13 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		row.append(inv.name)
 		row.append(inv.customer_name)
 
+
 		
 		total = ([im.get("total") for im in invoice_income_map if im.name == inv.name])[0]
-		total_taxes_and_charges = ([im.get("total_taxes_and_charges") for im in invoice_income_map if im.name == inv.name])[0]
+		total_taxes_and_charges = ([im.get("total_taxes_and_charges") for im in invoice_tax_map if im.name == inv.name])[0]
 		grand_total = ([im.get("grand_total") for im in invoice_income_map if im.name == inv.name])[0]
 
- 		row += [total, total_taxes_and_charges, grand_total]
+ 		row += [total, total_taxes_and_charges,  grand_total]
 		
 		amt_list = get_amount_entries(inv.name)
 		for col in mop:
@@ -54,6 +55,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		change_amount = ([im.get("change_amount") for im in invoice_income_map if im.name == inv.name])[0]
 		
 		row.append(change_amount)
+		row.append(inv.owner)
 
 		data.append(row)
 
@@ -62,14 +64,14 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 def get_columns(invoice_list, additional_table_columns,filters):
 	"""return columns based on filters"""
 	columns = [
-		_("Invoice") + ":Link/Sales Invoice:120",
-	 	_("Customer Name") + "::120"
+		_("Invoice") + ":Link/Sales Invoice:100",
+	 	_("Customer Name") + "::120",
 	]
 
 	if additional_table_columns:
 		columns += additional_table_columns
 
-	columns = columns + [_("Net Total") + ":Currency/currency:120"] + [_("Total Tax") + ":Currency/currency:120", _("Grand Total") + ":Currency/currency:120"]
+	columns = columns + [_("Net Total") + ":Currency/currency:100"] + [_("Total Tax") + ":Currency/currency:100"] + [_("Grand Total") + ":Currency/currency:100"]
 
 	mop_columns = []
 	mop = frappe.db.sql_list(
@@ -83,10 +85,11 @@ def get_columns(invoice_list, additional_table_columns,filters):
 		filters)
 	
 	for a in mop:
-		mop_columns = _(a) + ":Currency/currency:120"
+		mop_columns = _(a) + ":Currency/currency:110"
 		columns.append(mop_columns)  
 
-	columns.append(_("Change Amount") + ":Currency/Currency:120")
+	columns.append(_("Change Amount") + ":Currency/Currency:100")
+	columns.append(_("Owner") + "::150")
 
 	return columns, mop
 
@@ -137,7 +140,8 @@ def get_invoice_income_map(invoice_list):
 
 def get_invoice_tax_map(invoice_list):
 	tax_details = frappe.db.sql("""select name, total_taxes_and_charges from `tabSales Invoice`where docstatus = 1 and is_pos= 1 group by name desc""", as_dict=1)
-
+	# for x in xrange(1,10):
+	# 	print "tax_details", tax_details
 	return tax_details
 
 def get_invoice_so_dn_map(invoice_list):
