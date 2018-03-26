@@ -40,8 +40,9 @@ frappe.query_reports["JMI Sales Register"] = {
 			"fieldname":"owner",
 			"label": __("Owner"),
 			"fieldtype": "Link",
-			"options": "User"
-			// "default": frappe.session.user
+			"options": "User",
+			"default":frappe.session.user,
+			"read_only": (frappe.session.user==="Administrator") ? 0 : 1
 		},
 		{
 			"fieldname":"cost_center",
