@@ -7,7 +7,7 @@
  "doctype": "Report", 
  "idx": 0, 
  "is_standard": "Yes", 
- "modified": "2018-03-23 16:45:11.946721", 
+ "modified": "2018-03-27 15:54:03.799308", 
  "modified_by": "Administrator", 
  "module": "JMI ERPNext", 
  "name": "JMI Sales Register", 
@@ -24,6 +24,12 @@
   }, 
   {
    "role": "Administrator"
+  }, 
+  {
+   "role": "Accounts Manager"
+  }, 
+  {
+   "role": "Sales Manager"
   }
  ]
 }
