@@ -41,8 +41,8 @@ frappe.query_reports["JMI Sales Register"] = {
 			"label": __("Owner"),
 			"fieldtype": "Link",
 			"options": "User",
-			"default":frappe.session.user,
-			"read_only": (frappe.session.user==="Administrator") ? 0 : 1
+			"default":(has_common(frappe.user_roles, ["Stock User","Sales User"])) ? frappe.session.user : "",
+			"read_only": (frappe.session.user==="Administrator") ? 0 : (has_common(frappe.user_roles, ["Stock User","Sales User"])) ? 1 : 0
 		},
 		{
 			"fieldname":"cost_center",
