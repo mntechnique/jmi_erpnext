@@ -9,7 +9,6 @@ frappe.query_reports["Daily Sales Invoice"] = {
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"default":  frappe.datetime.get_today(),
-			"read_only": (frappe.session.user==="Accounts Manager") ? 0 : 1,
 			"width": "80"
 		},
 		{
@@ -42,7 +41,7 @@ frappe.query_reports["Daily Sales Invoice"] = {
 			"label": __("Owner"),
 			"fieldtype": "Link",
 			"options": "User",
-			"default":(has_common(frappe.user_roles, ["Stock User","Sales User"])) ? frappe.session.user : ""
+			"default": frappe.session.user 
 		},
 		{
 			"fieldname":"cost_center",

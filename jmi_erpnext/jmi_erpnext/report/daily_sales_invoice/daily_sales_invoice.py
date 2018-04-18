@@ -228,6 +228,8 @@ def get_item_details(inv_name):
 
 def get_county(inv_name):
 
-	get_address = frappe.get_doc("Address" , frappe.get_doc("Sales Invoice" , inv_name).customer_address).county
-
-	return get_address
+	ad = frappe.get_doc("Sales Invoice" , inv_name).customer_address
+	if ad:
+		return frappe.get_doc("Address" , ad ).county
+	else:
+		return ""
