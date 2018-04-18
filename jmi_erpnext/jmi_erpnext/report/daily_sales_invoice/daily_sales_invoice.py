@@ -53,7 +53,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			else:
 				tax_type = 0	
 			row = [
-			 inv.customer, inv.name, inv.posting_date, inv.po_no , (""),("")  ,("") , "Next 30 Days", inv.owner,inv.debit_to, si_county
+			 inv.customer, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , "Next 30 Days", inv.owner,inv.debit_to, si_county
 		]
 
 			row +=[
@@ -129,7 +129,7 @@ def get_invoices(filters, additional_query_columns):
 
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select name, posting_date, debit_to, project, customer, po_no,
+		select name, posting_date, debit_to, project, customer, jmi_po_no,
 		customer_name, owner, address_display, remarks, territory, tax_id, customer_group,
 		base_net_total, base_grand_total, base_rounded_total, outstanding_amount {0}
 		from `tabSales Invoice`
