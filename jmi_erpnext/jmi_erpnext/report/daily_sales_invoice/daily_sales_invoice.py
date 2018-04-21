@@ -41,8 +41,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		
 		si_county = get_county(inv.name)
 		cust_id = get_customer_id(inv.name)
-		for x in xrange(1,10):
-			print "cust_id", cust_id
+		sales_rep_id = get_sale_rep_id(inv.name)
 		item_list = get_item_details(inv.name)
 		
 		for a_entry in item_list:
@@ -56,7 +55,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			else:
 				tax_type = 0	
 			row = [
-			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), inv.owner,inv.debit_to, si_county
+			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,inv.debit_to, si_county
 		]
 
 			row +=[
@@ -68,9 +67,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				a_entry.get("quantity") , a_entry.get("rate") , a_entry.get("sr_no"), si_county 
 				
 			]
-			for x in xrange(1,10):
-				print "row",row
-
+			
 			data.append(row)
 			
 
@@ -242,5 +239,12 @@ def get_customer_id(inv_name):
 	c_id = frappe.get_doc("Sales Invoice" , inv_name).customer
 	if c_id:
 		return frappe.get_doc("Customer" , c_id ).jmi_customer_id
+	else:
+		return ""
+
+def get_sale_rep_id(inv_name):
+	owner = frappe.get_doc("Sales Invoice",inv_name).owner
+	if owner:
+		return frappe.get_doc("User",owner).full_name
 	else:
 		return ""
