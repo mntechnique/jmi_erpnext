@@ -93,9 +93,9 @@ def get_columns(invoice_list, additional_table_columns):
 		 _("Accounts Receivable Account") + ":Data/Account:120", _("Sales Tax Id") + "::80",
 		 _("Number of Distributions") + ":Data:120",  _("Invoice/CM Distribution") + "::120" ,
 		 _("Quantity") + ":Data:100", _("Item ID") + "::100", _("Description") + "::100",
-		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Currency:100" , _("Tax Type") + ":Data:100" ,
-		 _("Amount") + ":Currency:80" , _("U/M ID") + "::80" , _("U/M No of Stocking units") + ":Data:180",
-		 _("Stocking Quantity") + ":Data:120" , _("Stocking Unit Price") + ":Currency:150" ,
+		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Data:100" , _("Tax Type") + ":Data:100" ,
+		 _("Amount") + ":Data:80" , _("U/M ID") + "::80" , _("U/M No of Stocking units") + ":Data:180",
+		 _("Stocking Quantity") + ":Data:120" , _("Stocking Unit Price") + ":Data:150" ,
 		 _("Serial Number") + "::100" , _("Sales Tax Agency") + "::120"		
 	]
 
