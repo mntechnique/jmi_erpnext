@@ -55,8 +55,11 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			else:
 				tax_type = 0	
 			row = [
-			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,inv.debit_to, si_county
+			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,11000, si_county
 		]
+
+		# Accounts Receivable Id (Dynamic)
+		# inv.debit_to
 
 			row +=[
 			len(item_list) ,("") 
@@ -86,12 +89,12 @@ def get_columns(invoice_list, additional_table_columns):
 	columns +=[
 		_("Ship Via") + "::80", _("Ship Date") + "::80", _("Date Due") + "::80", _("Displayed Terms") + "::120",
 		_("Sales Representative ID") + "::120",	  
-		 _("Accounts Receivable Account") + ":Link/Account:120", _("Sales Tax Id") + "::80",
-		 _("Number of Distributions") + "::120",  _("Invoice/CM Distribution") + "::120" ,
-		 _("Quantity") + "::100", _("Item ID") + "::100", _("Description") + "::100",
-		 _("G/L Account") + "::100" , _("Unit Price") + ":Currency:100" , _("Tax Type") + "::100" ,
-		 _("Amount") + ":Currency:80" , _("U/M ID") + "::80" , _("U/M No of Stocking units") + "::180",
-		 _("Stocking Quantity") + "::120" , _("Stocking Unit Price") + ":Currency:150" ,
+		 _("Accounts Receivable Account") + ":Data/Account:120", _("Sales Tax Id") + "::80",
+		 _("Number of Distributions") + ":Data:120",  _("Invoice/CM Distribution") + "::120" ,
+		 _("Quantity") + ":Data:100", _("Item ID") + "::100", _("Description") + "::100",
+		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Currency:100" , _("Tax Type") + ":Data:100" ,
+		 _("Amount") + ":Currency:80" , _("U/M ID") + "::80" , _("U/M No of Stocking units") + ":Data:180",
+		 _("Stocking Quantity") + ":Data:120" , _("Stocking Unit Price") + ":Currency:150" ,
 		 _("Serial Number") + "::100" , _("Sales Tax Agency") + "::120"		
 	]
 
@@ -216,15 +219,15 @@ def get_item_details(inv_name):
 			"quantity": item_entries.items[x].qty , 
 			"item code": item_entries.items[x].item_code ,
 			"desc" : item_entries.items[x].description ,
-			"rate" : item_entries.items[x].rate ,
-			"amt" : item_entries.items[x].amount ,
+			"rate" : item_entries.items[x].rate,
+			"amt" : item_entries.items[x].amount*-1 ,
 			"sr_no" : item_entries.items[x].serial_no })
 	
 	for y in xrange(0, len(item_entries.taxes)):
 		z.append({		
 			"parent" : item_entries.taxes[y].parent,
 			"desc" : item_entries.taxes[y].description,
-			"amt" : item_entries.taxes[y].total })
+			"amt" : item_entries.taxes[y].total*-1 })
 
 	return z
 
