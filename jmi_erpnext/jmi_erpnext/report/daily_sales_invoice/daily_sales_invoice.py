@@ -219,15 +219,15 @@ def get_item_details(inv_name):
 			"quantity": item_entries.items[x].qty , 
 			"item code": item_entries.items[x].item_code ,
 			"desc" : item_entries.items[x].description ,
-			"rate" : item_entries.items[x].rate ,
-			"amt" : item_entries.items[x].amount ,
+			"rate" : item_entries.items[x].rate,
+			"amt" : item_entries.items[x].amount*-1 ,
 			"sr_no" : item_entries.items[x].serial_no })
 	
 	for y in xrange(0, len(item_entries.taxes)):
 		z.append({		
 			"parent" : item_entries.taxes[y].parent,
 			"desc" : item_entries.taxes[y].description,
-			"amt" : item_entries.taxes[y].total })
+			"amt" : item_entries.taxes[y].total*-1 })
 
 	return z
 
