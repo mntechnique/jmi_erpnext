@@ -42,6 +42,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		si_county = get_county(inv.name)
 		cust_id = get_customer_id(inv.name)
 		sales_rep_id = get_sale_rep_id(inv.name)
+		acc_no = account_number(inv.name)
 		item_list = get_item_details(inv.name)
 		
 		for a_entry in item_list:
@@ -55,7 +56,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			else:
 				tax_type = 0	
 			row = [
-			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,11000, si_county
+			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,acc_no, si_county
 		]
 
 		# Accounts Receivable Id (Dynamic)
@@ -78,8 +79,8 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
-		_("Customer") + ":Link/Customer:120",
-		_("Invoice No") + ":Link/Sales Invoice:120", _("Posting Date") + ":Date:100" , _("Customer PO No") + ":Link/Sales Invoice:120"
+		_("Customer") + ":Data/Customer:120",
+		_("Invoice No") + ":Link/Sales Invoice:120", _("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
 		
 	]
 
@@ -249,5 +250,12 @@ def get_sale_rep_id(inv_name):
 	owner = frappe.get_doc("Sales Invoice",inv_name).owner
 	if owner:
 		return frappe.get_doc("User",owner).full_name
+	else:
+		return ""
+
+def account_number(inv_name):
+	a_no = frappe.get_doc("Sales Invoice",inv_name).debit_to
+	if a_no:
+		return frappe.get_doc("Account",a_no).account_number
 	else:
 		return ""
