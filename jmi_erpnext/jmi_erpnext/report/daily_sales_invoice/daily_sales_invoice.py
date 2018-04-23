@@ -38,7 +38,6 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			for col in additional_query_columns:
 				row.append(inv.get(col))
 		
-		
 		si_county = get_county(inv.name)
 		cust_id = get_customer_id(inv.name)
 		sales_rep_id = get_sale_rep_id(inv.name)
@@ -49,14 +48,11 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 			if a_entry.get("item code"):
 				tax_agency = ""
-			else:
-				tax_agency = a_entry.get("desc")
-
-
-			if a_entry.get("item code"):
 				tax_type = 1
 			else:
-				tax_type = 0	
+				tax_agency = a_entry.get("desc")
+				tax_type = 0
+
 			row = [
 			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,acc_no, si_county
 		]
