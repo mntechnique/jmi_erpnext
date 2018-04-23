@@ -46,10 +46,12 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		item_list = get_item_details(inv.name)
 		
 		for a_entry in item_list:
+
 			if a_entry.get("item code"):
-				gl_acc = 40200
+				tax_agency = ""
 			else:
-				gl_acc = 23100
+				tax_agency = a_entry.get("desc")
+
 
 			if a_entry.get("item code"):
 				tax_type = 1
@@ -59,22 +61,18 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,acc_no, si_county
 		]
 
-		# Accounts Receivable Id (Dynamic)
-		# inv.debit_to
-
 			row +=[
 			len(item_list) ,("") 
 		]
 			row +=[
-				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , gl_acc , a_entry.get("rate") , tax_type , a_entry.get("amt"),
+				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , frappe.get_doc("Account" , a_entry.get("gl_acc")).account_number , a_entry.get("rate") , tax_type , a_entry.get("amt"),
 				("") ,("")  ,
-				a_entry.get("quantity") , a_entry.get("rate") , a_entry.get("sr_no"), si_county 
+				a_entry.get("quantity") , a_entry.get("rate") , a_entry.get("sr_no"), tax_agency
 				
 			]
 			
 			data.append(row)
 			
-
 	return columns, data
 
 def get_columns(invoice_list, additional_table_columns):
@@ -222,12 +220,14 @@ def get_item_details(inv_name):
 			"desc" : item_entries.items[x].description ,
 			"rate" : item_entries.items[x].rate,
 			"amt" : item_entries.items[x].amount*-1 ,
+			"gl_acc": item_entries.items[x].income_account,
 			"sr_no" : item_entries.items[x].serial_no })
 	
 	for y in xrange(0, len(item_entries.taxes)):
 		z.append({		
 			"parent" : item_entries.taxes[y].parent,
 			"desc" : item_entries.taxes[y].description,
+			"gl_acc" : item_entries.taxes[y].account_head,
 			"amt" : item_entries.taxes[y].total*-1 })
 
 	return z
