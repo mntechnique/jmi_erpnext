@@ -245,7 +245,7 @@ def get_customer_id(inv_name):
 def get_sale_rep_id(inv_name):
 	owner = frappe.get_doc("Sales Invoice",inv_name).owner
 	if owner:
-		return frappe.get_doc("User",owner).full_name
+		return frappe.get_doc("User",owner).username
 	else:
 		return ""
 
