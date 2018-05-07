@@ -14,8 +14,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 	invoice_list = get_invoices(filters, additional_query_columns)
 	columns = get_columns(invoice_list, additional_table_columns)
-	for x in xrange(1,5):
-		print "inv", invoice_list
+	
 	if not invoice_list:
 		msgprint(_("No record found"))
 		return columns, invoice_list
@@ -57,7 +56,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 
 			row = [
-			 cust_id, inv.name, inv.customer_group, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
+			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
 		]
 
 			row +=[
@@ -77,7 +76,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
 		_("Customer") + ":Data/Customer:120",
-		_("Invoice No") + ":Link/Sales Invoice:120", _("Customer Group") + ":Data:100",_("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
+		_("Invoice No") + ":Link/Sales Invoice:120", _("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
 		
 	]
 
@@ -132,7 +131,7 @@ def get_invoices(filters, additional_query_columns):
 
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select name, posting_date, debit_to, project, customer, customer_group, jmi_po_no,
+		select name, posting_date, debit_to, project, customer, jmi_po_no,
 		customer_name, owner, address_display, remarks, territory, tax_id, customer_group,
 		base_net_total, base_grand_total, base_rounded_total, outstanding_amount {0}
 		from `tabSales Invoice`
