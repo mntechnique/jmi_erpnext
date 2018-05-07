@@ -53,8 +53,6 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_agency = a_entry.get("desc")
 				tax_type = 0
 
-
-
 			row = [
 			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
 		]
@@ -69,8 +67,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				
 			]
 			
-			data.append(row)
-			
+			data.append(row)			
 	return columns, data
 
 def get_columns(invoice_list, additional_table_columns):
@@ -205,7 +202,6 @@ def get_mode_of_payments(invoice_list):
 	return mode_of_payments
 
 def get_item_details(inv_name):
-
 	item_entries = frappe.get_doc("Sales Invoice" , inv_name)
 	z = []
 
@@ -231,9 +227,9 @@ def get_item_details(inv_name):
 	return z
 
 def get_county(inv_name):
-	ad = frappe.get_doc("Sales Invoice" , inv_name).customer_address
-	if ad:
-		return frappe.get_doc("Address" , ad ).county
+	ad_county = frappe.get_doc("Sales Invoice" , inv_name).customer_address
+	if ad_county:
+		return frappe.get_doc("Address" , ad_county ).county
 	else:
 		return ""
 
