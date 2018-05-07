@@ -14,7 +14,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 	invoice_list = get_invoices(filters, additional_query_columns)
 	columns = get_columns(invoice_list, additional_table_columns)
-
+	
 	if not invoice_list:
 		msgprint(_("No record found"))
 		return columns, invoice_list
@@ -41,7 +41,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		si_county = get_county(inv.name)
 		cust_id = get_customer_id(inv.name)
 		sales_rep_id = get_sale_rep_id(inv.name)
-		acc_no = account_number(inv.name)
+		acc_no = get_receivable_account_number(inv.name)
 		item_list = get_item_details(inv.name)
 		
 		for a_entry in item_list:
@@ -54,21 +54,20 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_type = 0
 
 			row = [
-			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,acc_no, si_county
+			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
 		]
 
 			row +=[
 			len(item_list) ,("") 
 		]
 			row +=[
-				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , frappe.get_doc("Account" , a_entry.get("gl_acc")).account_number , a_entry.get("rate") , tax_type , a_entry.get("amt"),
+				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , frappe.get_doc("Account" ,(frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number, a_entry.get("rate") , tax_type , a_entry.get("amt"),
 				("") ,("")  ,
 				a_entry.get("quantity") , a_entry.get("rate") , a_entry.get("sr_no"), tax_agency
 				
 			]
 			
-			data.append(row)
-			
+			data.append(row)			
 	return columns, data
 
 def get_columns(invoice_list, additional_table_columns):
@@ -203,7 +202,6 @@ def get_mode_of_payments(invoice_list):
 	return mode_of_payments
 
 def get_item_details(inv_name):
-
 	item_entries = frappe.get_doc("Sales Invoice" , inv_name)
 	z = []
 
@@ -229,9 +227,9 @@ def get_item_details(inv_name):
 	return z
 
 def get_county(inv_name):
-	ad = frappe.get_doc("Sales Invoice" , inv_name).customer_address
-	if ad:
-		return frappe.get_doc("Address" , ad ).county
+	ad_county = frappe.get_doc("Sales Invoice" , inv_name).customer_address
+	if ad_county:
+		return frappe.get_doc("Address" , ad_county ).county
 	else:
 		return ""
 
@@ -249,9 +247,9 @@ def get_sale_rep_id(inv_name):
 	else:
 		return ""
 
-def account_number(inv_name):
+def get_receivable_account_number(inv_name):
 	a_no = frappe.get_doc("Sales Invoice",inv_name).debit_to
 	if a_no:
-		return frappe.get_doc("Account",a_no).account_number
+		return frappe.get_doc("Account" ,(frappe.get_doc("Account", a_no).parent_account)).account_number
 	else:
 		return ""
