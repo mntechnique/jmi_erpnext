@@ -14,7 +14,8 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 	invoice_list = get_invoices(filters, additional_query_columns)
 	columns = get_columns(invoice_list, additional_table_columns)
-
+	for x in xrange(1,5):
+		print "inv", invoice_list
 	if not invoice_list:
 		msgprint(_("No record found"))
 		return columns, invoice_list
@@ -41,7 +42,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 		si_county = get_county(inv.name)
 		cust_id = get_customer_id(inv.name)
 		sales_rep_id = get_sale_rep_id(inv.name)
-		acc_no = account_number(inv.name)
+		acc_no = get_receivable_account_number(inv.name)
 		item_list = get_item_details(inv.name)
 		
 		for a_entry in item_list:
@@ -53,15 +54,17 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_agency = a_entry.get("desc")
 				tax_type = 0
 
+
+
 			row = [
-			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id,acc_no, si_county
+			 cust_id, inv.name, inv.customer_group, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
 		]
 
 			row +=[
 			len(item_list) ,("") 
 		]
 			row +=[
-				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , frappe.get_doc("Account" , a_entry.get("gl_acc")).account_number , a_entry.get("rate") , tax_type , a_entry.get("amt"),
+				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , frappe.get_doc("Account" ,(frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number, a_entry.get("rate") , tax_type , a_entry.get("amt"),
 				("") ,("")  ,
 				a_entry.get("quantity") , a_entry.get("rate") , a_entry.get("sr_no"), tax_agency
 				
@@ -74,7 +77,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
 		_("Customer") + ":Data/Customer:120",
-		_("Invoice No") + ":Link/Sales Invoice:120", _("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
+		_("Invoice No") + ":Link/Sales Invoice:120", _("Customer Group") + ":Data:100",_("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
 		
 	]
 
@@ -129,7 +132,7 @@ def get_invoices(filters, additional_query_columns):
 
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select name, posting_date, debit_to, project, customer, jmi_po_no,
+		select name, posting_date, debit_to, project, customer, customer_group, jmi_po_no,
 		customer_name, owner, address_display, remarks, territory, tax_id, customer_group,
 		base_net_total, base_grand_total, base_rounded_total, outstanding_amount {0}
 		from `tabSales Invoice`
@@ -249,9 +252,9 @@ def get_sale_rep_id(inv_name):
 	else:
 		return ""
 
-def account_number(inv_name):
+def get_receivable_account_number(inv_name):
 	a_no = frappe.get_doc("Sales Invoice",inv_name).debit_to
 	if a_no:
-		return frappe.get_doc("Account",a_no).account_number
+		return frappe.get_doc("Account",a_no).parent_account
 	else:
 		return ""
