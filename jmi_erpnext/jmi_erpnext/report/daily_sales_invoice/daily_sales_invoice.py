@@ -254,6 +254,6 @@ def get_sale_rep_id(inv_name):
 def get_receivable_account_number(inv_name):
 	a_no = frappe.get_doc("Sales Invoice",inv_name).debit_to
 	if a_no:
-		return frappe.get_doc("Account",a_no).parent_account
+		return frappe.get_doc("Account" ,(frappe.get_doc("Account", a_no).parent_account)).account_number
 	else:
 		return ""
