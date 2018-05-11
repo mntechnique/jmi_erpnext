@@ -14,8 +14,8 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 	invoice_list = get_invoices(filters, additional_query_columns)
 	columns = get_columns(invoice_list, additional_table_columns)
-	for x in xrange(1,3):
-		print "Invoice list", invoice_list
+	
+		
 	if not invoice_list:
 		msgprint(_("No record found"))
 		return columns, invoice_list
