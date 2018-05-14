@@ -59,8 +59,7 @@ frappe.query_reports["Daily Sales Invoice"] = {
 			"fieldname": "customer_group",
 			"label": __("Customer Group"),
 			"fieldtype": "Link",
-			"options": "Customer Group",
-			"default": "All Customer Groups"
+			"options": "Customer Group"
 		}
 	]
 }

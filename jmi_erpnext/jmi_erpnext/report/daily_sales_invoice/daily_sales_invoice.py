@@ -13,9 +13,8 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 	if not filters: filters = frappe._dict({})
 
 	invoice_list = get_invoices(filters, additional_query_columns)
-	columns = get_columns(invoice_list, additional_table_columns)
+	columns = get_columns(invoice_list, additional_table_columns)	
 	
-		
 	if not invoice_list:
 		msgprint(_("No record found"))
 		return columns, invoice_list
@@ -55,7 +54,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_type = 0
 
 			row = [
-			 cust_id, inv.customer_group, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
+			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
 		]
 
 			row +=[
@@ -74,7 +73,6 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
 		_("Customer") + ":Data/Customer:120",
-		_("Customer Group") + ":Link/Customer Group:130",
 		_("Invoice No") + ":Link/Sales Invoice:120", _("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
 		
 	]
@@ -83,9 +81,9 @@ def get_columns(invoice_list, additional_table_columns):
 		columns += additional_table_columns
 
 	columns +=[
-		_("Ship Via") + "::80", _("Ship Date") + "::80", _("Date Due") + "::80", _("Displayed Terms") + "::120",
-		_("Sales Representative ID") + "::120",	  
-		 _("Accounts Receivable Account") + ":Data/Account:120", _("Sales Tax Id") + "::80",
+		 _("Ship Via") + "::80", _("Ship Date") + "::80", _("Date Due") + "::80", _("Displayed Terms") + "::120",
+		 _("Sales Representative ID") + "::120",	  
+		 _("Accounts Receivable Account") + ":Data:120", _("Sales Tax Id") + "::80",
 		 _("Number of Distributions") + ":Data:120",  _("Invoice/CM Distribution") + "::120" ,
 		 _("Quantity") + ":Data:100", _("Item ID") + "::100", _("Description") + "::100",
 		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Data:100" , _("Tax Type") + ":Data:100" ,
