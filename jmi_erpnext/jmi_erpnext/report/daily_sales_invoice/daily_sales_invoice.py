@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.utils import flt
 from frappe import msgprint, _
+from frappe.utils import cstr, getdate, add_months, add_days, today, get_last_day, get_first_day
 
 def execute(filters=None):
 	return _execute(filters)
@@ -38,11 +39,12 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 			for col in additional_query_columns:
 				row.append(inv.get(col))
 		
-		si_county = get_county(inv.name)
+		sales_tax_id = get_sales_tax_id(inv.name)
 		cust_id = get_customer_id(inv.name)
 		sales_rep_id = get_sale_rep_id(inv.name)
 		acc_no = get_receivable_account_number(inv.name)
 		item_list = get_item_details(inv.name)
+		due_date = get_date_due(inv.name)
 		
 		for a_entry in item_list:
 
@@ -53,27 +55,25 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_agency = a_entry.get("desc")
 				tax_type = 0
 
+			gl_acc = frappe.get_doc("Account", (frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number
 			row = [
-			 cust_id, inv.name, inv.posting_date, inv.jmi_po_no , (""),("")  ,("") , (""), sales_rep_id, acc_no, si_county
-		]
+				cust_id, inv.name, inv.posting_date, inv.jmi_po_no, due_date,	sales_rep_id, acc_no, sales_tax_id	]
+
+			row +=[ 
+				len(item_list) ]
 
 			row +=[
-			len(item_list) ,("") 
-		]
-			row +=[
-				a_entry.get("quantity"), a_entry.get("item code") , a_entry.get("desc") , frappe.get_doc("Account" ,(frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number, a_entry.get("rate") , tax_type , a_entry.get("amt"),
-				("") ,("")  ,
-				a_entry.get("quantity") , a_entry.get("rate") , a_entry.get("sr_no"), tax_agency
-				
-			]
+				a_entry.get("quantity"), a_entry.get("item code"), a_entry.get("desc"), gl_acc, a_entry.get("rate") , tax_type , a_entry.get("amt"),
+				a_entry.get("sr_no"), tax_agency ]
 			
 			data.append(row)			
+	
 	return columns, data
 
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
-		_("Customer") + ":Data/Customer:120",
-		_("Invoice No") + ":Link/Sales Invoice:120", _("Posting Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
+		_("Customer ID") + ":Data/Customer:120",
+		_("Invoice/CM#") + ":Link/Sales Invoice:120", _("Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
 		
 	]
 
@@ -81,14 +81,12 @@ def get_columns(invoice_list, additional_table_columns):
 		columns += additional_table_columns
 
 	columns +=[
-		 _("Ship Via") + "::80", _("Ship Date") + "::80", _("Date Due") + "::80", _("Displayed Terms") + "::120",
-		 _("Sales Representative ID") + "::120",	  
+		 _("Date Due") + ":Date:100", _("Sales Representative ID") + "::120",	  
 		 _("Accounts Receivable Account") + ":Data:120", _("Sales Tax Id") + "::80",
-		 _("Number of Distributions") + ":Data:120",  _("Invoice/CM Distribution") + "::120" ,
-		 _("Quantity") + ":Data:100", _("Item ID") + "::100", _("Description") + "::100",
-		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Data:100" , _("Tax Type") + ":Data:100" ,
-		 _("Amount") + ":Data:80" , _("U/M ID") + "::80" , _("U/M No of Stocking units") + ":Data:180",
-		 _("Stocking Quantity") + ":Data:120" , _("Stocking Unit Price") + ":Data:150" ,
+		 _("Number of Distributions") + ":Data:120", _("Quantity") + ":Data:100", 
+		 _("Item ID") + "::100", _("Description") + "::100",
+		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Data:100", 
+		 _("Tax Type") + ":Data:100" , _("Amount") + ":Data:80",
 		 _("Serial Number") + "::100" , _("Sales Tax Agency") + "::120"		
 	]
 
@@ -121,6 +119,7 @@ def get_conditions(filters):
 			 	and ifnull(`tabSales Invoice Item`.warehouse, '') = %(warehouse)s)"""
 
 	if filters.get("customer_group"): conditions += " and customer_group = %(customer_group)s"
+	
 	return conditions
 
 def get_invoices(filters, additional_query_columns):
@@ -169,7 +168,7 @@ def get_invoice_so_dn_map(invoice_list):
 
 		if delivery_note_list:
 			invoice_so_dn_map.setdefault(d.parent, frappe._dict()).setdefault("delivery_note", delivery_note_list)
-
+	
 	return invoice_so_dn_map
 
 def get_invoice_cc_wh_map(invoice_list):
@@ -187,7 +186,7 @@ def get_invoice_cc_wh_map(invoice_list):
 		if d.warehouse:
 			invoice_cc_wh_map.setdefault(d.parent, frappe._dict()).setdefault(
 				"warehouse", []).append(d.warehouse)
-
+	
 	return invoice_cc_wh_map
 
 def get_mode_of_payments(invoice_list):
@@ -199,7 +198,7 @@ def get_mode_of_payments(invoice_list):
 
 		for d in inv_mop:
 			mode_of_payments.setdefault(d.parent, []).append(d.mode_of_payment)
-
+	
 	return mode_of_payments
 
 def get_item_details(inv_name):
@@ -224,33 +223,41 @@ def get_item_details(inv_name):
 			"desc" : item_entries.taxes[y].description,
 			"gl_acc" : item_entries.taxes[y].account_head,
 			"amt" : item_entries.taxes[y].total*-1 })
-
+	
 	return z
 
-def get_county(inv_name):
-	ad_county = frappe.get_doc("Sales Invoice" , inv_name).customer_address
-	if ad_county:
-		return frappe.get_doc("Address" , ad_county ).county
+def get_sales_tax_id(inv_name):
+	ad_county = frappe.get_doc("Sales Invoice", inv_name).customer_address
+	county = frappe.get_doc("Address", ad_county ).county
+	ad_county_trunc = county[0:8]
+	if ad_county_trunc:
+		return ad_county_trunc
 	else:
 		return ""
 
 def get_customer_id(inv_name):
-	c_id = frappe.get_doc("Sales Invoice" , inv_name).customer
+	c_id = frappe.get_doc("Sales Invoice", inv_name).customer
 	if c_id:
-		return frappe.get_doc("Customer" , c_id ).jmi_customer_id
+		return frappe.get_doc("Customer", c_id ).jmi_customer_id
 	else:
 		return ""
 
 def get_sale_rep_id(inv_name):
-	owner = frappe.get_doc("Sales Invoice",inv_name).owner
+	owner = frappe.get_doc("Sales Invoice", inv_name).owner
 	if owner:
-		return frappe.get_doc("User",owner).username
+		return frappe.get_doc("User", owner).username
 	else:
 		return ""
 
 def get_receivable_account_number(inv_name):
-	a_no = frappe.get_doc("Sales Invoice",inv_name).debit_to
+	a_no = frappe.get_doc("Sales Invoice", inv_name).debit_to
 	if a_no:
-		return frappe.get_doc("Account" ,(frappe.get_doc("Account", a_no).parent_account)).account_number
+		return frappe.get_doc("Account", (frappe.get_doc("Account", a_no).parent_account)).account_number
 	else:
 		return ""
+
+def get_date_due(inv_name):
+	due_date = frappe.get_doc("Sales Invoice", inv_name).posting_date
+	new_due_date = add_months(due_date, 1)
+
+	return new_due_date
