@@ -63,8 +63,8 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				len(item_list) ]
 
 			row +=[
-				a_entry.get("quantity"), a_entry.get("item code"), a_entry.get("desc"), gl_acc, a_entry.get("rate") , tax_type , a_entry.get("amt"),
-				a_entry.get("sr_no"), tax_agency ]
+				a_entry.get("quantity"), a_entry.get("item code"), a_entry.get("sr_no"), a_entry.get("desc"), gl_acc, a_entry.get("rate") , tax_type , a_entry.get("amt"),
+				 tax_agency ]
 			
 			data.append(row)			
 	
@@ -73,7 +73,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
 		_("Customer ID") + ":Data/Customer:120",
-		_("Invoice/CM#") + ":Link/Sales Invoice:120", _("Credit Memo") + "::120",  _("Date") + ":Date:100" , _("Customer PO No") + ":Data/Sales Invoice:120"
+		_("Invoice/CM#") + ":Link/Sales Invoice:120", _("Credit Memo") + "::120",  _("Date") + ":Date:100" , _("Customer PO") + ":Data/Sales Invoice:120"
 		
 	]
 
@@ -84,10 +84,10 @@ def get_columns(invoice_list, additional_table_columns):
 		 _("Date Due") + ":Date:100", _("Sales Representative ID") + "::120",	  
 		 _("Accounts Receivable Account") + ":Data:120", _("Sales Tax Id") + "::80",
 		 _("Number of Distributions") + ":Data:120", _("Quantity") + ":Data:100", 
-		 _("Item ID") + "::100", _("Description") + "::100",
+		 _("Item ID") + "::100",  _("Serial Number") + "::100" ,  _("Description") + "::100",
 		 _("G/L Account") + ":Data:100" , _("Unit Price") + ":Data:100", 
 		 _("Tax Type") + ":Data:100" , _("Amount") + ":Data:80",
-		 _("Serial Number") + "::100" , _("Sales Tax Agency") + "::120"		
+		 _("Sales Tax Agency") + "::120"		
 	]
 
 	return columns
