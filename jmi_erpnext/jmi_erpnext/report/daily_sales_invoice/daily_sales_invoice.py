@@ -55,6 +55,10 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_agency = a_entry.get("desc")
 				tax_type = 0
 
+			value_amt = a_entry.get("amt")
+			if not value_amt:
+				value_amt = 0
+				 
 			gl_acc = frappe.get_doc("Account", (frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number
 			row = [
 				cust_id, inv.name, "", inv.posting_date, inv.jmi_po_no, due_date,	sales_rep_id, acc_no, sales_tax_id	]
@@ -63,7 +67,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				len(item_list) ]
 
 			row +=[
-				a_entry.get("quantity"), a_entry.get("item code"), a_entry.get("sr_no"), a_entry.get("desc"), gl_acc, a_entry.get("rate") , tax_type , a_entry.get("amt"),
+				a_entry.get("quantity"), a_entry.get("item code"), a_entry.get("sr_no"), a_entry.get("desc"), gl_acc, a_entry.get("rate") , tax_type , value_amt,
 				 tax_agency ]
 			
 			data.append(row)			
@@ -106,17 +110,17 @@ def get_conditions(filters):
 	if filters.get("mode_of_payment"):
 		conditions += """ and exists(select name from `tabSales Invoice Payment`
 			 where parent=`tabSales Invoice`.name
-			 	and ifnull(`tabSales Invoice Payment`.mode_of_payment, '') = %(mode_of_payment)s)"""
+				and ifnull(`tabSales Invoice Payment`.mode_of_payment, '') = %(mode_of_payment)s)"""
 
 	if filters.get("cost_center"):
 		conditions +=  """ and exists(select name from `tabSales Invoice Item`
 			 where parent=`tabSales Invoice`.name
-			 	and ifnull(`tabSales Invoice Item`.cost_center, '') = %(cost_center)s)"""
+				and ifnull(`tabSales Invoice Item`.cost_center, '') = %(cost_center)s)"""
 
 	if filters.get("warehouse"):
 		conditions +=  """ and exists(select name from `tabSales Invoice Item`
 			 where parent=`tabSales Invoice`.name
-			 	and ifnull(`tabSales Invoice Item`.warehouse, '') = %(warehouse)s)"""
+				and ifnull(`tabSales Invoice Item`.warehouse, '') = %(warehouse)s)"""
 
 	if filters.get("customer_group"): conditions += " and customer_group = %(customer_group)s"
 	
@@ -168,7 +172,7 @@ def get_invoice_so_dn_map(invoice_list):
 
 		if delivery_note_list:
 			invoice_so_dn_map.setdefault(d.parent, frappe._dict()).setdefault("delivery_note", delivery_note_list)
-	
+
 	return invoice_so_dn_map
 
 def get_invoice_cc_wh_map(invoice_list):
@@ -186,7 +190,7 @@ def get_invoice_cc_wh_map(invoice_list):
 		if d.warehouse:
 			invoice_cc_wh_map.setdefault(d.parent, frappe._dict()).setdefault(
 				"warehouse", []).append(d.warehouse)
-	
+
 	return invoice_cc_wh_map
 
 def get_mode_of_payments(invoice_list):
@@ -198,7 +202,7 @@ def get_mode_of_payments(invoice_list):
 
 		for d in inv_mop:
 			mode_of_payments.setdefault(d.parent, []).append(d.mode_of_payment)
-	
+
 	return mode_of_payments
 
 def get_item_details(inv_name):
@@ -216,14 +220,14 @@ def get_item_details(inv_name):
 			"amt" : item_entries.items[x].amount*-1 ,
 			"gl_acc": item_entries.items[x].income_account,
 			"sr_no" : item_entries.items[x].serial_no })
-	
+
 	for y in xrange(0, len(item_entries.taxes)):
 		z.append({		
 			"parent" : item_entries.taxes[y].parent,
 			"desc" : item_entries.taxes[y].description,
 			"gl_acc" : item_entries.taxes[y].account_head,
-			"amt" : item_entries.taxes[y].total*-1 })
-	
+			"amt" : item_entries.taxes[y].tax_amount*-1 })
+
 	return z
 
 def get_sales_tax_id(inv_name):
