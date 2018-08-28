@@ -61,7 +61,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				 
 			gl_acc = frappe.get_doc("Account", (frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number
 			row = [
-				cust_id, inv.customer_group, inv.name, "", inv.posting_date, inv.jmi_po_no, due_date,	sales_rep_id, acc_no, sales_tax_id	]
+				cust_id, inv.name, "", inv.posting_date, inv.jmi_po_no, due_date,	sales_rep_id, acc_no, sales_tax_id	]
 
 			row +=[ 
 				len(item_list) ]
@@ -76,7 +76,7 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 
 def get_columns(invoice_list, additional_table_columns):
 	columns = [
-		_("Customer ID") + ":Data/Customer:120", _("Customer Group") + ":Link/Customer Group:120",
+		_("Customer ID") + ":Data/Customer:120",
 		_("Invoice/CM#") + ":Link/Sales Invoice:120", _("Credit Memo") + "::120",  _("Date") + ":Date:100" , _("Customer PO") + ":Data/Sales Invoice:120"
 		
 	]
