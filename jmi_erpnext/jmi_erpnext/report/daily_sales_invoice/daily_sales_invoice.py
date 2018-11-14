@@ -40,8 +40,8 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				row.append(inv.get(col))
 		
 		sales_tax_id = get_sales_tax_id(inv.name)
-		cust_id = get_customer_id(inv.name)
-		sales_rep_id = get_sale_rep_id(inv.name)
+		cust_id = get_customer_id(inv.customer)
+		sales_rep_id = get_sales_rep_id(inv.owner)
 		acc_no = get_receivable_account_number(inv.name)
 		item_list = get_item_details(inv.name)
 		due_date = get_date_due(inv.name)
@@ -55,9 +55,9 @@ def _execute(filters, additional_table_columns=None, additional_query_columns=No
 				tax_agency = a_entry.get("desc")
 				tax_type = 0
 
-			value_amt = a_entry.get("amt")
-			if not value_amt:
-				value_amt = 0
+			value_amt = a_entry.get("amt") or 0
+			# if not value_amt:
+			# 	value_amt = 0
 				 
 			gl_acc = frappe.get_doc("Account", (frappe.get_doc("Account", a_entry.get("gl_acc")).parent_account)).account_number
 			row = [
@@ -123,8 +123,8 @@ def get_conditions(filters):
 				and ifnull(`tabSales Invoice Item`.warehouse, '') = %(warehouse)s)"""
 
 	if filters.get("customer_group"): 
-		conditions += """ and exists(select customer_name from `tabCustomer`
-			 where customer_name =`tabSales Invoice`.customer
+		conditions += """ and exists(select name from `tabCustomer`
+			 where name =`tabSales Invoice`.customer
 				and ifnull(`tabSales Invoice`.customer_group, '') = %(customer_group)s)"""
 	
 	return conditions
@@ -242,19 +242,11 @@ def get_sales_tax_id(inv_name):
 	else:
 		return ""
 
-def get_customer_id(inv_name):
-	c_id = frappe.get_doc("Sales Invoice", inv_name).customer
-	if c_id:
-		return frappe.get_doc("Customer", c_id ).jmi_customer_id
-	else:
-		return ""
+def get_customer_id(customer):
+	return frappe.db.get_value("Customer", customer, "jmi_customer_id") or ""
 
-def get_sale_rep_id(inv_name):
-	owner = frappe.get_doc("Sales Invoice", inv_name).owner
-	if owner:
-		return frappe.get_doc("User", owner).username
-	else:
-		return ""
+def get_sales_rep_id(owner):
+	return frappe.db.get_value("User", owner, "username") or ""
 
 def get_receivable_account_number(inv_name):
 	a_no = frappe.get_doc("Sales Invoice", inv_name).debit_to
